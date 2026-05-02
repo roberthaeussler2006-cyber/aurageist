@@ -7,6 +7,7 @@ import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/type
 import { FigureBlurb, formatYears } from "./FigureBlurb";
 import { SocialLink } from "./SocialLink";
 import { useAuth } from "./AuthProvider";
+import { Comments } from "./Comments";
 
 type VoteResult = {
   winnerId: string;
@@ -108,6 +109,10 @@ export function MatchupClient({ category = "historical" }: { category?: Category
   useEffect(() => {
     if (!matchup || submitting) return;
     function onKey(ev: KeyboardEvent) {
+      const t = ev.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) {
+        return;
+      }
       if (ev.key === "ArrowLeft") {
         ev.preventDefault();
         submitVote(matchup!.a, matchup!.b);
@@ -200,7 +205,7 @@ function PairLayout({
 }) {
   return (
     <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-12 items-stretch">
-      <div className="md:tilt-left">
+      <div className="md:tilt-left flex flex-col">
         <FigureChoice
           figure={a}
           onClick={() => onVote(a, b)}
@@ -216,6 +221,7 @@ function PairLayout({
           lost={voteResult?.loserId === a.id}
           side="left"
         />
+        <Comments figureId={a.id} compact />
       </div>
 
       <div className="flex md:flex-col items-center justify-center gap-4 py-2 md:py-0 z-10">
@@ -236,7 +242,7 @@ function PairLayout({
         </button>
       </div>
 
-      <div className="md:tilt-right">
+      <div className="md:tilt-right flex flex-col">
         <FigureChoice
           figure={b}
           onClick={() => onVote(b, a)}
@@ -252,6 +258,7 @@ function PairLayout({
           lost={voteResult?.loserId === b.id}
           side="right"
         />
+        <Comments figureId={b.id} compact />
       </div>
     </div>
   );

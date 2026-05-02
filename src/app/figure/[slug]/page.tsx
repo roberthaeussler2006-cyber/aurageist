@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import type { FigureDetailResponse } from "@/lib/types";
 import { formatYears } from "@/components/FigureBlurb";
 import { SocialLink } from "@/components/SocialLink";
+import { Comments } from "@/components/Comments";
 
 export const dynamic = "force-dynamic";
 
@@ -137,6 +138,8 @@ export default async function FigurePage({
             </ul>
           )}
         </section>
+
+        <Comments figureId={figure.id} />
 
         <div className="mt-12 text-center">
           <Link
