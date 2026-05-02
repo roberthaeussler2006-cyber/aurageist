@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const SCORE_KEY = "kirk-clicker-score";
 const UPGRADES_KEY = "kirk-clicker-upgrades";
 const FIGURE_SLUG = "Charlie_Kirk";
+const MAX_KIRKS_ON_SCREEN = 250;
 
 type Upgrades = {
   power: number;
@@ -12,38 +13,24 @@ type Upgrades = {
 };
 
 const UPGRADE_DEFS = [
-  {
-    id: "power" as const,
-    label: "Stronger Click",
-    desc: "+1 per click",
-    baseCost: 25,
-    growth: 1.6,
-  },
-  {
-    id: "auto" as const,
-    label: "Auto-Clicker",
-    desc: "+1 per second",
-    baseCost: 100,
-    growth: 1.7,
-  },
+  { id: "power" as const, label: "Stronger Click", desc: "+1 per click", baseCost: 25, growth: 1.6 },
+  { id: "auto" as const, label: "Auto-Clicker", desc: "+1 per second", baseCost: 100, growth: 1.7 },
 ];
 
 function costFor(base: number, growth: number, owned: number) {
   return Math.floor(base * Math.pow(growth, owned));
 }
 
-type FloatNum = { id: number; x: number; y: number; n: number };
+type Kirk = { id: number; x: number; y: number; rot: number; size: number };
 
 export function KirkClicker() {
-  const [open, setOpen] = useState(false);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [upgrades, setUpgrades] = useState<Upgrades>({ power: 0, auto: 0 });
-  const [floats, setFloats] = useState<FloatNum[]>([]);
-  const [bump, setBump] = useState(0);
-  const floatId = useRef(0);
+  const [kirks, setKirks] = useState<Kirk[]>([]);
+  const kirkId = useRef(0);
 
-  // Load persistent state once.
+  // Load persistent state.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const s = Number(window.localStorage.getItem(SCORE_KEY) ?? "0");
@@ -56,7 +43,6 @@ export function KirkClicker() {
     }
   }, []);
 
-  // Persist score & upgrades.
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(SCORE_KEY, String(score));
@@ -66,9 +52,8 @@ export function KirkClicker() {
     window.localStorage.setItem(UPGRADES_KEY, JSON.stringify(upgrades));
   }, [upgrades]);
 
-  // Fetch portrait when opened.
+  // Fetch portrait once.
   useEffect(() => {
-    if (!open || imgUrl) return;
     let cancelled = false;
     fetch(`/api/figure/${FIGURE_SLUG}`)
       .then((r) => r.json())
@@ -79,9 +64,9 @@ export function KirkClicker() {
     return () => {
       cancelled = true;
     };
-  }, [open, imgUrl]);
+  }, []);
 
-  // Auto-click tick.
+  // Auto-clicker tick.
   useEffect(() => {
     if (upgrades.auto <= 0) return;
     const id = window.setInterval(() => {
@@ -90,25 +75,25 @@ export function KirkClicker() {
     return () => window.clearInterval(id);
   }, [upgrades.auto]);
 
-  // Garbage-collect old floats.
+  // Global click listener — every click anywhere spawns a kirk + score.
   useEffect(() => {
-    if (floats.length === 0) return;
-    const id = window.setTimeout(() => {
-      setFloats((arr) => arr.slice(-12));
-    }, 900);
-    return () => window.clearTimeout(id);
-  }, [floats]);
-
-  function click(e: React.MouseEvent<HTMLButtonElement>) {
-    const gain = 1 + upgrades.power;
-    setScore((s) => s + gain);
-    setBump((b) => b + 1);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    floatId.current += 1;
-    setFloats((arr) => [...arr, { id: floatId.current, x, y, n: gain }]);
-  }
+    function onClick(e: MouseEvent) {
+      // Ignore clicks on the upgrades panel itself (so buying doesn't double-count).
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.("[data-kirk-ui]")) return;
+      const gain = 1 + upgrades.power;
+      setScore((s) => s + gain);
+      kirkId.current += 1;
+      const size = 48 + Math.random() * 40;
+      const rot = (Math.random() - 0.5) * 60;
+      setKirks((arr) => {
+        const next = [...arr, { id: kirkId.current, x: e.clientX, y: e.clientY, rot, size }];
+        return next.length > MAX_KIRKS_ON_SCREEN ? next.slice(-MAX_KIRKS_ON_SCREEN) : next;
+      });
+    }
+    window.addEventListener("click", onClick);
+    return () => window.removeEventListener("click", onClick);
+  }, [upgrades.power]);
 
   function buy(id: keyof Upgrades) {
     const def = UPGRADE_DEFS.find((d) => d.id === id)!;
@@ -118,76 +103,56 @@ export function KirkClicker() {
     setUpgrades((u) => ({ ...u, [id]: u[id] + 1 }));
   }
 
-  if (!open) {
-    return (
-      <button
-        type="button"
-        aria-label="open kirk clicker"
-        onClick={() => setOpen(true)}
-        className="fixed top-20 sm:top-24 left-4 sm:left-6 z-[60] h-14 w-14 rounded-full bg-white border border-line shadow-lg hover:scale-110 transition-transform grid place-items-center text-2xl font-bold"
-        title="Kirk Clicker"
-      >
-        👆
-      </button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center p-4">
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        aria-label="close"
-        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white text-black text-lg font-bold grid place-items-center shadow-lg hover:scale-110 transition"
-      >
-        ×
-      </button>
-
-      <div className="text-white text-center mb-4">
-        <div className="text-5xl sm:text-6xl font-extrabold tabular-nums">
-          {score.toLocaleString()}
-        </div>
-        <div className="text-xs uppercase tracking-[0.3em] text-white/60 mt-1">kirks</div>
-      </div>
-
-      <button
-        type="button"
-        onClick={click}
-        className="relative h-56 w-56 sm:h-72 sm:w-72 rounded-full overflow-hidden ring-4 ring-white/20 shadow-2xl select-none"
-        style={{
-          transform: `scale(${1 + (bump % 2 === 0 ? 0 : -0.06)})`,
-          transition: "transform 80ms ease-out",
-        }}
-      >
-        {imgUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imgUrl}
-            alt="click"
-            draggable={false}
-            className="h-full w-full object-cover pointer-events-none"
-          />
-        ) : (
-          <div className="h-full w-full bg-white/10 grid place-items-center text-white/60 text-sm">
-            loading…
-          </div>
-        )}
-        {floats.map((f) => (
+    <>
+      {/* Spawned kirks — pointer-events none so clicks pass through to underlying UI */}
+      <div className="fixed inset-0 z-[90] pointer-events-none overflow-hidden">
+        {kirks.map((k) => (
           <span
-            key={f.id}
-            className="pointer-events-none absolute text-2xl font-bold text-white drop-shadow"
+            key={k.id}
+            className="absolute"
             style={{
-              left: f.x,
-              top: f.y,
-              animation: "kirkfloat 800ms ease-out forwards",
+              left: k.x,
+              top: k.y,
+              width: k.size,
+              height: k.size,
+              transform: `translate(-50%, -50%) rotate(${k.rot}deg)`,
+              animation: "kirkpop 220ms ease-out",
             }}
           >
-            +{f.n}
+            {imgUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imgUrl}
+                alt=""
+                draggable={false}
+                className="w-full h-full rounded-full object-cover ring-2 ring-white/40 shadow"
+              />
+            ) : null}
           </span>
         ))}
-      </button>
+      </div>
 
-      <div className="mt-6 w-full max-w-md grid gap-2">
+      {/* Score corner — top-left */}
+      <div
+        data-kirk-ui
+        className="fixed top-20 sm:top-24 left-4 sm:left-6 z-[95] pointer-events-none select-none"
+      >
+        <div className="bg-black/80 text-white rounded-2xl px-4 py-2 shadow-lg backdrop-blur-sm">
+          <div className="text-2xl font-extrabold tabular-nums leading-none">
+            {score.toLocaleString()}
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.25em] text-white/60 mt-0.5">
+            kirks
+          </div>
+        </div>
+      </div>
+
+      {/* Upgrades — bottom-right corner, interactive */}
+      <div
+        data-kirk-ui
+        className="fixed bottom-3 right-3 z-[95] grid gap-1.5 w-[200px]"
+      >
         {UPGRADE_DEFS.map((def) => {
           const owned = upgrades[def.id];
           const cost = costFor(def.baseCost, def.growth, owned);
@@ -196,38 +161,41 @@ export function KirkClicker() {
             <button
               key={def.id}
               type="button"
-              onClick={() => buy(def.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                buy(def.id);
+              }}
               disabled={!can}
-              className={`flex items-center justify-between rounded-xl px-4 py-3 text-left transition border ${
+              className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-xs transition border shadow ${
                 can
-                  ? "bg-white text-black border-white hover:scale-[1.02]"
-                  : "bg-white/10 text-white/50 border-white/10 cursor-not-allowed"
+                  ? "bg-white text-black border-white hover:scale-[1.03]"
+                  : "bg-black/70 text-white/60 border-white/10 cursor-not-allowed"
               }`}
             >
-              <div>
-                <div className="font-semibold">
-                  {def.label} <span className="text-xs opacity-60">×{owned}</span>
+              <div className="min-w-0">
+                <div className="font-semibold truncate">
+                  {def.label} <span className="opacity-60">×{owned}</span>
                 </div>
-                <div className="text-xs opacity-70">{def.desc}</div>
+                <div className="opacity-70 truncate">{def.desc}</div>
               </div>
-              <div className="text-sm font-mono tabular-nums">{cost.toLocaleString()}</div>
+              <div className="font-mono tabular-nums shrink-0">{cost.toLocaleString()}</div>
             </button>
           );
         })}
       </div>
 
-      <style jsx>{`
-        @keyframes kirkfloat {
+      <style jsx global>{`
+        @keyframes kirkpop {
           0% {
-            opacity: 1;
-            transform: translate(-50%, -50%) translateY(0);
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(0deg) scale(0.3);
           }
           100% {
-            opacity: 0;
-            transform: translate(-50%, -50%) translateY(-60px);
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
           }
         }
       `}</style>
-    </div>
+    </>
   );
 }
