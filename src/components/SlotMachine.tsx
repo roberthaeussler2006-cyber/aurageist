@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 type SlotFig = { name: string; image_url: string | null };
 
 const CHARLI_IMG =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Charlie_Kirk_%2853952923573%29_%28headshot_cropped%29.jpg/440px-Charlie_Kirk_%2853952923573%29_%28headshot_cropped%29.jpg";
+  "https://upload.wikimedia.org/wikipedia/commons/1/10/Charlie_Kirk_%2853952923573%29_%28headshot_cropped%29.jpg";
 
 const CHARLI: SlotFig = {
   name: "CHARLI",
