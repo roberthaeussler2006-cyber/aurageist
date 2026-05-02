@@ -20,11 +20,16 @@ export async function GET(req: Request): Promise<NextResponse<MatchupResponse | 
   // a theme (e.g. musicians includes both Mozart and Drake).
   const category = theme ? null : parseCategory(url.searchParams.get("cat"));
 
-  const baseFilter = (q: ReturnType<typeof supabase.from>) => {
-    let next = q;
+  // The query builder's chained-method types get unwieldy across versions of
+  // supabase-js, so we lean on `any` for the conditional filter chain. The
+  // runtime contract (eq with a column name and value) is stable.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseFilter = <T>(q: T): T => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let next: any = q;
     if (theme) next = next.eq("theme", theme);
     if (category) next = next.eq("category", category);
-    return next;
+    return next as T;
   };
 
   const poolQ = baseFilter(supabase.from("figures").select("*"))
