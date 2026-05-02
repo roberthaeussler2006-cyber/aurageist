@@ -124,7 +124,7 @@ export function KirkClicker() {
         type="button"
         aria-label="open kirk clicker"
         onClick={() => setOpen(true)}
-        className="fixed bottom-3 left-3 z-50 h-12 w-12 rounded-full bg-white border border-line shadow-lg hover:scale-110 transition-transform grid place-items-center text-xl font-bold"
+        className="fixed top-20 sm:top-24 left-4 sm:left-6 z-[60] h-14 w-14 rounded-full bg-white border border-line shadow-lg hover:scale-110 transition-transform grid place-items-center text-2xl font-bold"
         title="Kirk Clicker"
       >
         👆
