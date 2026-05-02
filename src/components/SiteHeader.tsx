@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { StreakBadge } from "@/components/StreakBadge";
 
 export function SiteHeader() {
   const pathname = usePathname() ?? "/";
@@ -24,6 +25,7 @@ export function SiteHeader() {
           aurageist
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] font-bold">
+          <StreakBadge />
           <Link
             href={otherMatchupHref}
             className="px-2.5 sm:px-3 py-1.5 rounded-full text-muted hover:text-accent hover:bg-white/60 transition-all"

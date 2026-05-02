@@ -9,6 +9,7 @@ import { formatMoney, moneyBarPct } from "@/lib/money";
 import { SocialLink } from "./SocialLink";
 import { useAuth } from "./AuthProvider";
 import { Comments } from "./Comments";
+import { dispatchStreakRefresh } from "./StreakBadge";
 
 type VoteResult = {
   winnerId: string;
@@ -94,6 +95,7 @@ export function MatchupClient({ category = "historical" }: { category?: Category
           const winnerDelta = json.winnerNewElo - Number(winner.elo);
           const loserDelta = json.loserNewElo - Number(loser.elo);
           setVoteResult({ winnerId: winner.id, loserId: loser.id, winnerDelta, loserDelta });
+          if (session) dispatchStreakRefresh();
           advanceTimer.current = setTimeout(() => {
             setStatus("loading");
             setReloadKey((k) => k + 1);

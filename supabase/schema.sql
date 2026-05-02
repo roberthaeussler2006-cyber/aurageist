@@ -29,6 +29,39 @@ alter table figures add column if not exists money_rank int;
 -- Estimated net worth in whole USD. bigint covers values up to ~$9.2 quintillion.
 alter table figures add column if not exists net_worth_usd bigint;
 
+-- Returns (current_streak, longest_streak, last_vote_date) for a user, where a
+-- streak counts consecutive UTC dates with at least one personal vote. The
+-- current streak is non-zero only if the user voted today or yesterday.
+create or replace function get_user_streak(p_user_id uuid)
+returns table(current_streak int, longest_streak int, last_vote_date date)
+language sql
+stable
+as $$
+  with dates as (
+    select distinct (created_at at time zone 'UTC')::date as d
+    from personal_matches
+    where user_id = p_user_id
+  ),
+  ranked as (
+    select d, (d - (row_number() over (order by d))::int) as grp
+    from dates
+  ),
+  runs as (
+    select grp, count(*)::int as len, max(d) as ends
+    from ranked
+    group by grp
+  )
+  select
+    coalesce((
+      select len from runs
+      where ends >= (current_date - 1)
+      order by ends desc
+      limit 1
+    ), 0) as current_streak,
+    coalesce((select max(len) from runs), 0) as longest_streak,
+    (select max(d) from dates) as last_vote_date;
+$$;
+
 create table if not exists matches (
   id uuid primary key default gen_random_uuid(),
   winner_id uuid references figures(id) on delete cascade,
