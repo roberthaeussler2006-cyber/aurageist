@@ -37,6 +37,12 @@ export function SiteHeader() {
           >
             Ranks
           </Link>
+          <Link
+            href="/upsets"
+            className="px-2.5 sm:px-3 py-1.5 rounded-full text-muted hover:text-accent hover:bg-white/60 transition-all"
+          >
+            Upsets
+          </Link>
           {!loading && user && (
             <Link
               href="/leaderboard/personal"
