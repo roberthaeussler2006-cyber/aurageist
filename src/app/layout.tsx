@@ -25,10 +25,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <div className="noise-overlay" aria-hidden />
         <AuthProvider>
           <SiteHeader />
           <main className="flex-1 flex flex-col">{children}</main>
-          <footer className="px-5 sm:px-8 py-4 text-[10px] uppercase tracking-[0.18em] font-semibold text-muted/70 text-center">
+          <footer className="px-5 sm:px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 text-center">
             portraits via wikipedia · elo updates live
           </footer>
         </AuthProvider>

@@ -47,21 +47,23 @@ export function LeaderboardClient({ category = "historical" }: { category?: Cate
 
   return (
     <>
-      <div className="flex justify-center gap-2 mb-8">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => pickSort(t.id)}
-            className={`px-4 sm:px-5 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-[0.18em] font-semibold transition-all ${
-              sort === t.id
-                ? "bg-gradient text-white shadow-lg"
-                : "bg-panel border border-line text-muted hover:text-foreground hover:border-accent/40"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="flex justify-center gap-2 mb-10">
+        <div className="glass inline-flex p-1.5 rounded-full">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => pickSort(t.id)}
+              className={`px-4 sm:px-5 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-[0.16em] font-bold transition-all ${
+                sort === t.id
+                  ? "bg-gradient text-white shadow-lg"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {status === "loading" ? (

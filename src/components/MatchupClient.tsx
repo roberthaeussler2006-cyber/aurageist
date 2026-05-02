@@ -128,15 +128,20 @@ export function MatchupClient({ category = "historical" }: { category?: Category
   const subtitle = category === "current" ? "Current figures" : "Historical figures";
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 pb-10 pt-2">
-      <div className="mb-6 sm:mb-8 flex items-center gap-3">
-        <span className="pill">{subtitle}</span>
-        <Link
-          href={otherHref}
-          className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent transition-colors"
-        >
-          try {otherCategory} →
-        </Link>
+    <div className="flex-1 flex flex-col items-center justify-start px-3 sm:px-6 pb-10 pt-4 sm:pt-6">
+      <div className="w-full max-w-6xl text-center mb-6 sm:mb-10">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <span className="pill">{subtitle}</span>
+          <Link href={otherHref} className="btn-ghost">
+            try {otherCategory} →
+          </Link>
+        </div>
+        <h1 className="display text-[clamp(2.75rem,9vw,7rem)]">
+          who has more <span className="display-italic text-gradient">aura</span>?
+        </h1>
+        <p className="mt-3 text-sm sm:text-base text-foreground/60 max-w-md mx-auto">
+          Tap a portrait. Trust your gut. The Elo updates in real time.
+        </p>
       </div>
 
       <div className="w-full max-w-6xl flex-1 flex flex-col">
@@ -148,10 +153,10 @@ export function MatchupClient({ category = "historical" }: { category?: Category
           ) : matchup ? (
             <motion.div
               key={matchup.token}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }}
               className="flex-1 flex flex-col"
             >
               <PairLayout
@@ -167,8 +172,12 @@ export function MatchupClient({ category = "historical" }: { category?: Category
         </AnimatePresence>
       </div>
 
-      <div className="mt-8 text-[10px] uppercase tracking-[0.25em] text-muted/70 hidden sm:block">
-        ← left · right → · space to skip
+      <div className="mt-8 text-[10px] uppercase tracking-[0.25em] font-bold text-foreground/40 hidden sm:flex items-center gap-3">
+        <kbd className="px-2 py-1 rounded-md bg-white/60 border border-white/70 backdrop-blur text-[9px]">←</kbd> pick left
+        <span className="text-foreground/20">·</span>
+        <kbd className="px-2 py-1 rounded-md bg-white/60 border border-white/70 backdrop-blur text-[9px]">→</kbd> pick right
+        <span className="text-foreground/20">·</span>
+        <kbd className="px-2 py-1 rounded-md bg-white/60 border border-white/70 backdrop-blur text-[9px]">space</kbd> skip
       </div>
     </div>
   );
@@ -190,54 +199,60 @@ function PairLayout({
   voteResult: VoteResult | null;
 }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 items-stretch">
-      <FigureChoice
-        figure={a}
-        onClick={() => onVote(a, b)}
-        disabled={disabled}
-        delta={
-          voteResult?.winnerId === a.id
-            ? voteResult.winnerDelta
-            : voteResult?.loserId === a.id
-              ? voteResult.loserDelta
-              : null
-        }
-        won={voteResult?.winnerId === a.id}
-        lost={voteResult?.loserId === a.id}
-        side="left"
-      />
+    <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-12 items-stretch">
+      <div className="md:tilt-left">
+        <FigureChoice
+          figure={a}
+          onClick={() => onVote(a, b)}
+          disabled={disabled}
+          delta={
+            voteResult?.winnerId === a.id
+              ? voteResult.winnerDelta
+              : voteResult?.loserId === a.id
+                ? voteResult.loserDelta
+                : null
+          }
+          won={voteResult?.winnerId === a.id}
+          lost={voteResult?.loserId === a.id}
+          side="left"
+        />
+      </div>
 
-      <div className="flex md:flex-col items-center justify-center gap-3 md:gap-4 py-2 md:py-0">
-        <div className="text-center">
-          <div className="text-sm uppercase tracking-[0.25em] font-semibold text-muted">who has more</div>
-          <div className="serif text-4xl md:text-6xl italic divider-vs leading-none mt-1">aura</div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-muted mt-3">tap to vote</div>
+      <div className="flex md:flex-col items-center justify-center gap-4 py-2 md:py-0 z-10">
+        <div className="hidden md:flex flex-col items-center">
+          <span className="display-italic text-7xl divider-vs leading-none">vs</span>
         </div>
+        <div className="md:hidden display-italic text-5xl divider-vs">vs</div>
         <button
           type="button"
           onClick={onSkip}
           disabled={disabled}
-          className="px-5 py-2 rounded-full border border-line bg-panel text-[10px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent hover:border-accent/40 hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-default"
+          className="btn-ghost"
         >
-          I don&apos;t know
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 4l8 8-8 8M13 4l8 8-8 8" />
+          </svg>
+          Skip
         </button>
       </div>
 
-      <FigureChoice
-        figure={b}
-        onClick={() => onVote(b, a)}
-        disabled={disabled}
-        delta={
-          voteResult?.winnerId === b.id
-            ? voteResult.winnerDelta
-            : voteResult?.loserId === b.id
-              ? voteResult.loserDelta
-              : null
-        }
-        won={voteResult?.winnerId === b.id}
-        lost={voteResult?.loserId === b.id}
-        side="right"
-      />
+      <div className="md:tilt-right">
+        <FigureChoice
+          figure={b}
+          onClick={() => onVote(b, a)}
+          disabled={disabled}
+          delta={
+            voteResult?.winnerId === b.id
+              ? voteResult.winnerDelta
+              : voteResult?.loserId === b.id
+                ? voteResult.loserDelta
+                : null
+          }
+          won={voteResult?.winnerId === b.id}
+          lost={voteResult?.loserId === b.id}
+          side="right"
+        />
+      </div>
     </div>
   );
 }
@@ -259,6 +274,10 @@ function FigureChoice({
   lost: boolean;
   side: "left" | "right";
 }) {
+  const wonStyle = won
+    ? { borderColor: "var(--accent)", boxShadow: "0 0 0 6px var(--accent-soft), 0 60px 140px -30px var(--accent-glow), 0 1px 0 rgba(255,255,255,0.6) inset" }
+    : undefined;
+
   return (
     <div className="relative">
       <button
@@ -266,12 +285,12 @@ function FigureChoice({
         aria-label={`Vote ${figure.name} as having more aura`}
         onClick={onClick}
         disabled={disabled}
-        className={`card-bright group relative text-left overflow-hidden w-full ${
+        className={`glass-card group relative text-left overflow-hidden w-full ${
           disabled ? "cursor-default" : "cursor-pointer active:scale-[0.985]"
-        } ${won ? "ring-4 ring-offset-2 ring-offset-background" : ""} ${lost ? "opacity-50" : ""}`}
-        style={won ? { borderColor: "var(--accent)", boxShadow: "0 0 0 4px var(--accent-soft), var(--shadow-lg)" } : undefined}
+        } ${lost ? "opacity-45 saturate-50" : ""}`}
+        style={wonStyle}
       >
-        <div className="portrait-bright aspect-[3/4] sm:aspect-[4/5] w-full">
+        <div className="portrait-frame aspect-[3/4] sm:aspect-[4/5] w-full">
           {figure.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -282,34 +301,48 @@ function FigureChoice({
               draggable={false}
             />
           ) : (
-            <div className="h-full w-full grid place-items-center bg-[#f4f4f5] text-muted text-xs uppercase tracking-widest">
+            <div className="h-full w-full grid place-items-center bg-white/40 text-muted text-xs uppercase tracking-widest">
               no portrait
             </div>
           )}
+          <div className={`absolute bottom-3 ${side === "left" ? "left-3" : "right-3"} z-20`}>
+            <span className="pill-dark backdrop-blur-md bg-black/55">
+              {side === "left" ? "← Left" : "Right →"}
+            </span>
+          </div>
         </div>
 
-        <div className="px-5 sm:px-6 py-4 sm:py-5">
-          <h2 className="serif text-2xl sm:text-3xl leading-tight text-foreground">
+        <div className="px-5 sm:px-7 py-5 sm:py-6">
+          <h2 className="display-italic text-3xl sm:text-4xl leading-tight text-foreground">
             {figure.name}
           </h2>
-          <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mt-1">
-            {formatYears(figure.birth_year, figure.death_year) ?? "—"}
+          <div className="text-[11px] uppercase tracking-[0.16em] font-bold text-muted mt-1.5">
+            {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
           </div>
           <FigureBlurb text={figure.short_blurb} />
+          {figure.category === "current" && (
+            <CardRanks
+              fame={figure.fame_rank}
+              controversy={figure.controversy_rank}
+              money={figure.money_rank}
+            />
+          )}
         </div>
 
         <AnimatePresence>
           {delta !== null && (
             <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.45, type: "spring", stiffness: 220, damping: 18 }}
-              className={`absolute top-4 ${side === "left" ? "left-4" : "right-4"} z-20`}
+              initial={{ opacity: 0, y: -16, scale: 0.6, rotate: -6 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.55, type: "spring", stiffness: 240, damping: 16 }}
+              className={`absolute top-4 ${side === "left" ? "left-4" : "right-4"} z-30`}
             >
               <span
-                className={`inline-flex items-center px-3 py-1.5 rounded-full text-base sm:text-lg font-bold tabular-nums shadow-lg ${
-                  delta >= 0 ? "bg-gradient text-white" : "bg-white text-foreground/60 border border-line"
+                className={`inline-flex items-center px-4 py-2 rounded-full text-lg sm:text-2xl font-extrabold tabular-nums shadow-2xl ${
+                  delta >= 0
+                    ? "bg-gradient text-white"
+                    : "bg-black/85 text-white"
                 }`}
               >
                 {delta >= 0 ? "+" : ""}
@@ -330,6 +363,48 @@ function FigureChoice({
   );
 }
 
+function CardRanks({
+  fame,
+  controversy,
+  money,
+}: {
+  fame: number | null;
+  controversy: number | null;
+  money: number | null;
+}) {
+  if (fame == null && controversy == null && money == null) return null;
+  const items: { label: string; value: number | null; tone: string }[] = [
+    { label: "Famous", value: fame, tone: "from-fuchsia-500 to-rose-500" },
+    { label: "Controversial", value: controversy, tone: "from-amber-500 to-red-600" },
+    { label: "Money", value: money, tone: "from-emerald-500 to-teal-600" },
+  ];
+  return (
+    <div className="mt-4 space-y-2">
+      {items.map((i) => {
+        const pct = i.value == null ? 0 : Math.max(0, Math.min(100, i.value));
+        return (
+          <div key={i.label}>
+            <div className="flex items-baseline justify-between mb-1">
+              <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-muted">
+                {i.label}
+              </span>
+              <span className="text-xs font-bold tabular-nums text-foreground/85">
+                {i.value == null ? "—" : i.value}
+              </span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-line/60 overflow-hidden">
+              <div
+                className={`h-full bg-gradient-to-r ${i.tone} rounded-full`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function SkeletonPair() {
   return (
     <motion.div
@@ -337,16 +412,20 @@ function SkeletonPair() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10"
+      className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-12"
     >
-      <div className="card-bright aspect-[3/4] sm:aspect-[4/5] animate-pulse">
-        <div className="portrait-bright h-full w-full bg-[#f4f4f5]" />
+      <div className="md:tilt-left">
+        <div className="glass-card aspect-[3/4] sm:aspect-[4/5] animate-pulse overflow-hidden">
+          <div className="portrait-frame h-full w-full bg-white/40" />
+        </div>
       </div>
-      <div className="hidden md:flex items-center justify-center serif italic divider-vs text-4xl">
+      <div className="hidden md:flex items-center justify-center display-italic divider-vs text-7xl">
         vs
       </div>
-      <div className="card-bright aspect-[3/4] sm:aspect-[4/5] animate-pulse">
-        <div className="portrait-bright h-full w-full bg-[#f4f4f5]" />
+      <div className="md:tilt-right">
+        <div className="glass-card aspect-[3/4] sm:aspect-[4/5] animate-pulse overflow-hidden">
+          <div className="portrait-frame h-full w-full bg-white/40" />
+        </div>
       </div>
     </motion.div>
   );
