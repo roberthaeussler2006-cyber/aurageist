@@ -76,7 +76,8 @@ export function MatchupClient({
     if (status !== "ready" || !matchup || prefetched.current) return;
     const controller = new AbortController();
     const id = setTimeout(() => {
-      fetch(`/api/matchup?cat=${category}`, { cache: "no-store", signal: controller.signal })
+      const qs = theme ? `theme=${encodeURIComponent(theme)}` : `cat=${category}`;
+      fetch(`/api/matchup?${qs}`, { cache: "no-store", signal: controller.signal })
         .then(async (res) => {
           if (!res.ok) return;
           const json = (await res.json()) as MatchupResponse;
@@ -97,7 +98,7 @@ export function MatchupClient({
       clearTimeout(id);
       controller.abort();
     };
-  }, [status, matchup, category]);
+  }, [status, matchup, category, theme]);
 
   useEffect(() => {
     return () => {
