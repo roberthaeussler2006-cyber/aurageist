@@ -54,6 +54,13 @@ export function MatchupClient() {
     setReloadKey((k) => k + 1);
   }, []);
 
+  const skip = useCallback(() => {
+    if (submitting || status !== "ready") return;
+    setVoteResult(null);
+    setStatus("loading");
+    setReloadKey((k) => k + 1);
+  }, [submitting, status]);
+
   const submitVote = useCallback(
     (winner: Figure, loser: Figure) => {
       if (!matchup || submitting) return;
@@ -99,11 +106,14 @@ export function MatchupClient() {
       } else if (ev.key === "ArrowRight") {
         ev.preventDefault();
         submitVote(matchup!.b, matchup!.a);
+      } else if (ev.key === " " || ev.key.toLowerCase() === "s") {
+        ev.preventDefault();
+        skip();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [matchup, submitting, submitVote]);
+  }, [matchup, submitting, submitVote, skip]);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 pb-10 pt-2">
@@ -130,6 +140,7 @@ export function MatchupClient() {
                 a={matchup.a}
                 b={matchup.b}
                 onVote={submitVote}
+                onSkip={skip}
                 disabled={submitting}
                 voteResult={voteResult}
               />
@@ -139,7 +150,7 @@ export function MatchupClient() {
       </div>
 
       <div className="mt-8 text-[10px] uppercase tracking-[0.25em] text-muted/70 hidden sm:block">
-        ← left · right →
+        ← left · right → · space to skip
       </div>
     </div>
   );
@@ -149,12 +160,14 @@ function PairLayout({
   a,
   b,
   onVote,
+  onSkip,
   disabled,
   voteResult,
 }: {
   a: Figure;
   b: Figure;
   onVote: (winner: Figure, loser: Figure) => void;
+  onSkip: () => void;
   disabled: boolean;
   voteResult: VoteResult | null;
 }) {
@@ -183,6 +196,14 @@ function PairLayout({
           <div className="serif text-3xl md:text-5xl italic divider-vs mt-1">aura</div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-muted mt-2">tap to vote</div>
         </div>
+        <button
+          type="button"
+          onClick={onSkip}
+          disabled={disabled}
+          className="px-4 py-2 border border-line text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent hover:border-accent/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+        >
+          I don&apos;t know
+        </button>
         <span className="hidden md:block h-20 w-px bg-line" />
       </div>
 
