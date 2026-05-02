@@ -164,9 +164,33 @@ export function Comments({
 
   return (
     <section className={compact ? "mt-5" : "mt-10 sm:mt-14"}>
-      <h2 className={`text-[11px] uppercase tracking-[0.18em] font-semibold text-muted ${compact ? "mb-2" : "mb-4"}`}>
-        Comments {comments && comments.length > 0 ? `· ${comments.length}` : ""}
-      </h2>
+      <div className={`flex items-center justify-between ${compact ? "mb-2" : "mb-4"}`}>
+        <h2 className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">
+          Comments {comments && comments.length > 0 ? `· ${comments.length}` : ""}
+        </h2>
+        {comments && comments.filter((c) => !c.parent_id).length > 1 && (
+          <div className="flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] font-semibold">
+            <button
+              type="button"
+              onClick={() => setSort("top")}
+              className={`px-2 py-1 rounded-full transition-colors ${
+                sort === "top" ? "bg-accent/10 text-accent" : "text-muted hover:text-accent"
+              }`}
+            >
+              top
+            </button>
+            <button
+              type="button"
+              onClick={() => setSort("newest")}
+              className={`px-2 py-1 rounded-full transition-colors ${
+                sort === "newest" ? "bg-accent/10 text-accent" : "text-muted hover:text-accent"
+              }`}
+            >
+              new
+            </button>
+          </div>
+        )}
+      </div>
 
       <CommentForm
         compact={compact}
