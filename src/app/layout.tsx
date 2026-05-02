@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AuthProvider } from "@/components/AuthProvider";
+import { WalletProvider } from "@/components/WalletProvider";
 import { BrainrotPanel } from "@/components/BrainrotPanel";
 import { SlotMachine } from "@/components/SlotMachine";
 import { KirkClicker } from "@/components/KirkClicker";
@@ -37,16 +38,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full flex flex-col">
         <div className="noise-overlay" aria-hidden />
         <AuthProvider>
-          <SiteHeader />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <footer className="px-5 sm:px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 text-center flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <span>portraits via wikipedia</span>
-            <span aria-hidden className="text-muted/30">·</span>
-            <span>elo updates live</span>
-          </footer>
-          <BrainrotPanel />
-          <SlotMachine />
-          <KirkClicker />
+          <WalletProvider>
+            <SiteHeader />
+            <main className="flex-1 flex flex-col">{children}</main>
+            <footer className="px-5 sm:px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 text-center flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              <span>portraits via wikipedia</span>
+              <span aria-hidden className="text-muted/30">·</span>
+              <span>elo updates live</span>
+            </footer>
+            <BrainrotPanel />
+            <SlotMachine />
+            <KirkClicker />
+          </WalletProvider>
         </AuthProvider>
       </body>
     </html>

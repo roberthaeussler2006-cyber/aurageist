@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StreakBadge } from "@/components/StreakBadge";
+import { CoinBalance } from "@/components/CoinBalance";
 
 export function SiteHeader() {
   const pathname = usePathname() ?? "/";
@@ -25,6 +26,7 @@ export function SiteHeader() {
           aurageist
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] font-bold">
+          <CoinBalance />
           <StreakBadge />
           <Link
             href={otherMatchupHref}

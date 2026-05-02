@@ -12,12 +12,21 @@ import { useAuth } from "./AuthProvider";
 import { Comments } from "./Comments";
 import { dispatchStreakRefresh } from "./StreakBadge";
 import { useControversyImage } from "./ControversyImage";
+import { useWallet } from "./WalletProvider";
+import { resolveBet, settleBet, BET_TIERS } from "@/lib/wallet";
+import { CoinBurst, type Burst } from "./CoinBurst";
 
 type VoteResult = {
   winnerId: string;
   loserId: string;
   winnerDelta: number;
   loserDelta: number;
+  bet?: {
+    stake: number;
+    won: boolean;
+    payout: number;
+    multiplier: number;
+  };
 };
 
 type Status = "loading" | "ready" | "error";
@@ -40,6 +49,8 @@ export function MatchupClient({
   // advance, we use this immediately instead of showing a skeleton.
   const prefetched = useRef<MatchupResponse | null>(null);
   const { session } = useAuth();
+  const wallet = useWallet();
+  const [burst, setBurst] = useState<Burst | null>(null);
 
   useEffect(() => {
     // If we have a prefetched matchup ready, use it without a network round-trip.
@@ -121,9 +132,32 @@ export function MatchupClient({
   }, [submitting, status]);
 
   const submitVote = useCallback(
-    (winner: Figure, loser: Figure) => {
+    (winner: Figure, loser: Figure, side: "left" | "right") => {
       if (!matchup || submitting) return;
       setSubmitting(true);
+
+      // Resolve the bet client-side using the two figures' Elos. Stake is
+      // capped to current balance so the user can never go negative.
+      const stake = Math.min(wallet.bet, wallet.balance);
+      let bet: VoteResult["bet"] | undefined;
+      if (stake > 0) {
+        const r = resolveBet({
+          pickElo: Number(winner.elo),
+          otherElo: Number(loser.elo),
+          stake,
+        });
+        settleBet(stake, r);
+        bet = { stake, won: r.won, payout: r.payout, multiplier: r.multiplier };
+        if (r.won) {
+          setBurst({
+            id: `${matchup.token}-win`,
+            amount: r.payout,
+            origin: side === "left" ? "left" : "right",
+            multiplier: r.multiplier,
+          });
+        }
+      }
+
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (session?.access_token) {
         headers["Authorization"] = `Bearer ${session.access_token}`;
@@ -146,19 +180,21 @@ export function MatchupClient({
           const json = (await res.json()) as VoteResponse;
           const winnerDelta = json.winnerNewElo - Number(winner.elo);
           const loserDelta = json.loserNewElo - Number(loser.elo);
-          setVoteResult({ winnerId: winner.id, loserId: loser.id, winnerDelta, loserDelta });
+          setVoteResult({ winnerId: winner.id, loserId: loser.id, winnerDelta, loserDelta, bet });
           if (session) dispatchStreakRefresh();
+          // Wins linger a bit longer so the coin shower can play out.
+          const advanceMs = bet?.won ? 1900 : 1200;
           advanceTimer.current = setTimeout(() => {
             setStatus("loading");
             setReloadKey((k) => k + 1);
-          }, 1200);
+          }, advanceMs);
         })
         .catch((e: unknown) => {
           setError(e instanceof Error ? e.message : "vote failed");
           setSubmitting(false);
         });
     },
-    [matchup, submitting, session],
+    [matchup, submitting, session, wallet.bet, wallet.balance],
   );
 
   useEffect(() => {
@@ -170,10 +206,10 @@ export function MatchupClient({
       }
       if (ev.key === "ArrowLeft") {
         ev.preventDefault();
-        submitVote(matchup!.a, matchup!.b);
+        submitVote(matchup!.a, matchup!.b, "left");
       } else if (ev.key === "ArrowRight") {
         ev.preventDefault();
-        submitVote(matchup!.b, matchup!.a);
+        submitVote(matchup!.b, matchup!.a, "right");
       } else if (ev.key === " " || ev.key.toLowerCase() === "s") {
         ev.preventDefault();
         skip();
@@ -204,6 +240,12 @@ export function MatchupClient({
         </p>
       </div>
 
+      <BetBar
+        a={matchup?.a ?? null}
+        b={matchup?.b ?? null}
+        disabled={submitting || status !== "ready"}
+      />
+
       <div className="w-full max-w-6xl flex-1 flex flex-col">
         <AnimatePresence mode="wait">
           {status === "loading" ? (
@@ -232,6 +274,8 @@ export function MatchupClient({
         </AnimatePresence>
       </div>
 
+      <CoinBurst burst={burst} onDone={() => setBurst(null)} />
+
       <div className="mt-8 text-[10px] uppercase tracking-[0.25em] font-bold text-foreground/40 hidden sm:flex items-center gap-3">
         <kbd className="px-2 py-1 rounded-md bg-white/60 border border-white/70 backdrop-blur text-[9px]">←</kbd> pick left
         <span className="text-foreground/20">·</span>
@@ -253,7 +297,7 @@ function PairLayout({
 }: {
   a: Figure;
   b: Figure;
-  onVote: (winner: Figure, loser: Figure) => void;
+  onVote: (winner: Figure, loser: Figure, side: "left" | "right") => void;
   onSkip: () => void;
   disabled: boolean;
   voteResult: VoteResult | null;
@@ -264,7 +308,7 @@ function PairLayout({
         <div className="md:tilt-left flex flex-col min-w-0">
           <FigureChoice
             figure={a}
-            onClick={() => onVote(a, b)}
+            onClick={() => onVote(a, b, "left")}
             disabled={disabled}
             delta={
               voteResult?.winnerId === a.id
@@ -300,7 +344,7 @@ function PairLayout({
         <div className="md:tilt-right flex flex-col min-w-0">
           <FigureChoice
             figure={b}
-            onClick={() => onVote(b, a)}
+            onClick={() => onVote(b, a, "right")}
             disabled={disabled}
             delta={
               voteResult?.winnerId === b.id
@@ -600,5 +644,137 @@ function ErrorBlock({ message, onRetry }: { message: string; onRetry: () => void
         Try again
       </button>
     </motion.div>
+  );
+}
+
+function BetBar({ a, b, disabled }: { a: Figure | null; b: Figure | null; disabled: boolean }) {
+  const wallet = useWallet();
+  const [topupShown, setTopupShown] = useState(false);
+
+  // Auto-bail-out if user busted: hand them the house topup once.
+  useEffect(() => {
+    if (wallet.balance > 0) return;
+    const did = wallet.topUpIfBroke();
+    if (did) {
+      setTopupShown(true);
+      const t = setTimeout(() => setTopupShown(false), 2400);
+      return () => clearTimeout(t);
+    }
+  }, [wallet]);
+
+  const aOdds = a && b ? oddsMultiplier(Number(a.elo), Number(b.elo)) : null;
+  const bOdds = a && b ? oddsMultiplier(Number(b.elo), Number(a.elo)) : null;
+
+  return (
+    <div className="w-full max-w-3xl mx-auto -mt-2 mb-4 sm:mb-6">
+      <AnimatePresence>
+        {topupShown && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-center text-[11px] uppercase tracking-[0.2em] font-bold text-amber-700 bg-amber-100/80 border border-amber-300 rounded-full py-2 px-4 mb-3"
+          >
+            🎰 House grant: 500 coins on the rail
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="glass rounded-3xl px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center gap-3 sm:gap-5">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <CoinIcon />
+          <div>
+            <div className="text-[9px] uppercase tracking-[0.2em] font-bold text-muted leading-none">Stack</div>
+            <div className="display text-xl sm:text-2xl tabular-nums leading-tight">
+              {wallet.balance.toLocaleString()}
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden sm:block h-10 w-px bg-line" />
+
+        <div className="flex-1 flex flex-wrap items-center justify-center gap-1.5">
+          <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-muted mr-1">Bet</span>
+          {BET_TIERS.map((t) => {
+            const active = wallet.bet === t;
+            const tooBig = t > wallet.balance;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => wallet.setBet(t)}
+                disabled={tooBig}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-bold tabular-nums transition-all ${
+                  active
+                    ? "bg-gradient text-white shadow-md scale-105"
+                    : tooBig
+                      ? "bg-panel text-muted/40 cursor-not-allowed"
+                      : "bg-panel text-foreground hover:scale-105"
+                }`}
+              >
+                {t}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => wallet.setBet(Math.max(1, wallet.balance))}
+            disabled={wallet.balance < 1}
+            className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-[0.12em] transition-all ${
+              wallet.bet >= wallet.balance && wallet.balance > 0
+                ? "bg-foreground text-background"
+                : "bg-panel text-foreground hover:scale-105"
+            }`}
+          >
+            All-in
+          </button>
+        </div>
+
+        {a && b && aOdds != null && bOdds != null && (
+          <div className="flex items-center gap-3 shrink-0 text-[10px] uppercase tracking-[0.16em] font-bold">
+            <span className="text-muted hidden sm:inline">Odds</span>
+            <span className="text-accent tabular-nums">{aOdds.toFixed(2)}×</span>
+            <span className="text-muted/40">|</span>
+            <span className="text-accent tabular-nums">{bOdds.toFixed(2)}×</span>
+          </div>
+        )}
+      </div>
+
+      <p className="text-center text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 mt-2">
+        {disabled ? "Spin in progress…" : `Risking ${Math.min(wallet.bet, wallet.balance).toLocaleString()} on your pick`}
+      </p>
+    </div>
+  );
+}
+
+function oddsMultiplier(pickElo: number, otherElo: number): number {
+  const p = 1 / (1 + Math.pow(10, (otherElo - pickElo) / 400));
+  return Math.max(1.05, (1 / Math.max(p, 0.05)) * 0.9);
+}
+
+function CoinIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <defs>
+        <linearGradient id="hbcoin" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fff7c2" />
+          <stop offset="50%" stopColor="#facc15" />
+          <stop offset="100%" stopColor="#b45309" />
+        </linearGradient>
+      </defs>
+      <circle cx="20" cy="20" r="17" fill="url(#hbcoin)" stroke="#7c2d12" strokeWidth="1.2" />
+      <text
+        x="20"
+        y="26"
+        textAnchor="middle"
+        fontFamily="Georgia, serif"
+        fontStyle="italic"
+        fontWeight="700"
+        fontSize="16"
+        fill="#7c2d12"
+      >
+        A
+      </text>
+    </svg>
   );
 }
