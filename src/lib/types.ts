@@ -27,6 +27,7 @@ export type Figure = {
   fame_rank: number | null;
   controversy_rank: number | null;
   money_rank: number | null;
+  net_worth_usd: number | null;
 };
 
 export type MatchRecord = {

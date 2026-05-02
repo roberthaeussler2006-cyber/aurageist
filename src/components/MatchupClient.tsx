@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/types";
 import { FigureBlurb, formatYears } from "./FigureBlurb";
+import { formatMoney, moneyBarPct } from "@/lib/money";
 import { SocialLink } from "./SocialLink";
 import { useAuth } from "./AuthProvider";
 import { Comments } from "./Comments";
@@ -331,7 +332,7 @@ function FigureChoice({
             <CardRanks
               fame={figure.fame_rank}
               controversy={figure.controversy_rank}
-              money={figure.money_rank}
+              netWorth={figure.net_worth_usd}
             />
           )}
         </div>
@@ -373,41 +374,58 @@ function FigureChoice({
 function CardRanks({
   fame,
   controversy,
-  money,
+  netWorth,
 }: {
   fame: number | null;
   controversy: number | null;
-  money: number | null;
+  netWorth: number | null;
 }) {
-  if (fame == null && controversy == null && money == null) return null;
-  const items: { label: string; value: number | null; tone: string }[] = [
-    { label: "Famous", value: fame, tone: "from-fuchsia-500 to-rose-500" },
-    { label: "Controversial", value: controversy, tone: "from-amber-500 to-red-600" },
-    { label: "Money", value: money, tone: "from-emerald-500 to-teal-600" },
+  if (fame == null && controversy == null && netWorth == null) return null;
+  const items: {
+    label: string;
+    display: string;
+    pct: number;
+    tone: string;
+  }[] = [
+    {
+      label: "Famous",
+      display: fame == null ? "—" : `${fame}`,
+      pct: fame == null ? 0 : Math.max(0, Math.min(100, fame)),
+      tone: "from-fuchsia-500 to-rose-500",
+    },
+    {
+      label: "Controversial",
+      display: controversy == null ? "—" : `${controversy}`,
+      pct: controversy == null ? 0 : Math.max(0, Math.min(100, controversy)),
+      tone: "from-amber-500 to-red-600",
+    },
+    {
+      label: "Net worth",
+      display: formatMoney(netWorth),
+      pct: moneyBarPct(netWorth),
+      tone: "from-emerald-500 to-teal-600",
+    },
   ];
   return (
     <div className="mt-4 space-y-2">
-      {items.map((i) => {
-        const pct = i.value == null ? 0 : Math.max(0, Math.min(100, i.value));
-        return (
-          <div key={i.label}>
-            <div className="flex items-baseline justify-between mb-1">
-              <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-muted">
-                {i.label}
-              </span>
-              <span className="text-xs font-bold tabular-nums text-foreground/85">
-                {i.value == null ? "—" : i.value}
-              </span>
-            </div>
-            <div className="h-1.5 w-full rounded-full bg-line/60 overflow-hidden">
-              <div
-                className={`h-full bg-gradient-to-r ${i.tone} rounded-full`}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
+      {items.map((i) => (
+        <div key={i.label}>
+          <div className="flex items-baseline justify-between mb-1">
+            <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-muted">
+              {i.label}
+            </span>
+            <span className="text-xs font-bold tabular-nums text-foreground/85">
+              {i.display}
+            </span>
           </div>
-        );
-      })}
+          <div className="h-1.5 w-full rounded-full bg-line/60 overflow-hidden">
+            <div
+              className={`h-full bg-gradient-to-r ${i.tone} rounded-full`}
+              style={{ width: `${i.pct}%` }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

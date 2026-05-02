@@ -26,6 +26,8 @@ alter table figures add column if not exists social_kind text;
 alter table figures add column if not exists fame_rank int;
 alter table figures add column if not exists controversy_rank int;
 alter table figures add column if not exists money_rank int;
+-- Estimated net worth in whole USD. bigint covers values up to ~$9.2 quintillion.
+alter table figures add column if not exists net_worth_usd bigint;
 
 create table if not exists matches (
   id uuid primary key default gen_random_uuid(),

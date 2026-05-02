@@ -5,6 +5,7 @@ import type { FigureDetailResponse } from "@/lib/types";
 import { formatYears } from "@/components/FigureBlurb";
 import { SocialLink } from "@/components/SocialLink";
 import { Comments } from "@/components/Comments";
+import { formatMoney, moneyBarPct } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
@@ -95,7 +96,7 @@ export default async function FigurePage({
               <RankPanel
                 fame={figure.fame_rank}
                 controversy={figure.controversy_rank}
-                money={figure.money_rank}
+                netWorth={figure.net_worth_usd}
               />
             )}
           </div>
@@ -157,18 +158,41 @@ export default async function FigurePage({
 function RankPanel({
   fame,
   controversy,
-  money,
+  netWorth,
 }: {
   fame: number | null;
   controversy: number | null;
-  money: number | null;
+  netWorth: number | null;
 }) {
-  const items: { label: string; value: number | null; tone: string }[] = [
-    { label: "Famous", value: fame, tone: "from-fuchsia-500 to-rose-500" },
-    { label: "Controversial", value: controversy, tone: "from-amber-500 to-red-600" },
-    { label: "Money", value: money, tone: "from-emerald-500 to-teal-600" },
+  const items: {
+    label: string;
+    display: string;
+    suffix?: string;
+    pct: number;
+    tone: string;
+  }[] = [
+    {
+      label: "Famous",
+      display: fame == null ? "—" : `${fame}`,
+      suffix: fame == null ? undefined : "/ 100",
+      pct: fame == null ? 0 : Math.max(0, Math.min(100, fame)),
+      tone: "from-fuchsia-500 to-rose-500",
+    },
+    {
+      label: "Controversial",
+      display: controversy == null ? "—" : `${controversy}`,
+      suffix: controversy == null ? undefined : "/ 100",
+      pct: controversy == null ? 0 : Math.max(0, Math.min(100, controversy)),
+      tone: "from-amber-500 to-red-600",
+    },
+    {
+      label: "Net worth",
+      display: formatMoney(netWorth),
+      pct: moneyBarPct(netWorth),
+      tone: "from-emerald-500 to-teal-600",
+    },
   ];
-  const anyRated = items.some((i) => i.value != null);
+  const anyRated = fame != null || controversy != null || netWorth != null;
   return (
     <div className="mt-6 rounded-2xl border border-line bg-panel px-4 sm:px-5 py-4 sm:py-5 shadow-sm">
       <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted mb-3">
@@ -177,7 +201,14 @@ function RankPanel({
       {anyRated ? (
         <div className="space-y-3">
           {items.map((i) => (
-            <RankBar key={i.label} label={i.label} value={i.value} tone={i.tone} />
+            <RankBar
+              key={i.label}
+              label={i.label}
+              display={i.display}
+              suffix={i.suffix}
+              pct={i.pct}
+              tone={i.tone}
+            />
           ))}
         </div>
       ) : (
@@ -189,21 +220,26 @@ function RankPanel({
 
 function RankBar({
   label,
-  value,
+  display,
+  suffix,
+  pct,
   tone,
 }: {
   label: string;
-  value: number | null;
+  display: string;
+  suffix?: string;
+  pct: number;
   tone: string;
 }) {
-  const pct = value == null ? 0 : Math.max(0, Math.min(100, value));
   return (
     <div>
       <div className="flex items-baseline justify-between mb-1.5">
         <span className="text-xs sm:text-sm font-semibold text-foreground/80">{label}</span>
         <span className="text-sm font-bold tabular-nums text-foreground/90">
-          {value == null ? "—" : `${value}`}
-          <span className="text-[10px] uppercase tracking-[0.18em] text-muted ml-1">/ 100</span>
+          {display}
+          {suffix && (
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted ml-1">{suffix}</span>
+          )}
         </span>
       </div>
       <div className="h-2 w-full rounded-full bg-line/60 overflow-hidden">
