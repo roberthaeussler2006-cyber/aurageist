@@ -75,8 +75,35 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "vote recorded but no result returned" }, { status: 500 });
   }
 
+  let personalWinnerNewElo: number | null = null;
+  let personalLoserNewElo: number | null = null;
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice("Bearer ".length).trim();
+    if (token) {
+      const { data: userData } = await supabase.auth.getUser(token);
+      const userId = userData?.user?.id;
+      if (userId) {
+        const { data: pData, error: pErr } = await supabase.rpc("record_personal_vote", {
+          p_user_id: userId,
+          p_winner_id: body.winnerId,
+          p_loser_id: body.loserId,
+        });
+        if (!pErr) {
+          const pRow = Array.isArray(pData) ? pData[0] : pData;
+          if (pRow) {
+            personalWinnerNewElo = Number(pRow.winner_new_elo);
+            personalLoserNewElo = Number(pRow.loser_new_elo);
+          }
+        }
+      }
+    }
+  }
+
   return NextResponse.json({
     winnerNewElo: Number(row.winner_new_elo),
     loserNewElo: Number(row.loser_new_elo),
+    personalWinnerNewElo,
+    personalLoserNewElo,
   });
 }

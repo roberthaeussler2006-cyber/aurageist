@@ -5,6 +5,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/types";
 import { FigureBlurb, formatYears } from "./FigureBlurb";
+import { SocialLink } from "./SocialLink";
+import { useAuth } from "./AuthProvider";
 
 type VoteResult = {
   winnerId: string;
@@ -23,6 +25,7 @@ export function MatchupClient({ category = "historical" }: { category?: Category
   const [voteResult, setVoteResult] = useState<VoteResult | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { session } = useAuth();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -66,9 +69,13 @@ export function MatchupClient({ category = "historical" }: { category?: Category
     (winner: Figure, loser: Figure) => {
       if (!matchup || submitting) return;
       setSubmitting(true);
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
       fetch("/api/vote", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           winnerId: winner.id,
           loserId: loser.id,
@@ -95,7 +102,7 @@ export function MatchupClient({ category = "historical" }: { category?: Category
           setSubmitting(false);
         });
     },
-    [matchup, submitting],
+    [matchup, submitting, session],
   );
 
   useEffect(() => {
@@ -253,64 +260,68 @@ function FigureChoice({
   side: "left" | "right";
 }) {
   return (
-    <button
-      type="button"
-      aria-label={`Vote ${figure.name} as having more aura`}
-      onClick={onClick}
-      disabled={disabled}
-      className={`card-bright group relative text-left overflow-hidden ${
-        disabled ? "cursor-default" : "cursor-pointer active:scale-[0.985]"
-      } ${won ? "ring-4 ring-offset-2 ring-offset-background" : ""} ${lost ? "opacity-50" : ""}`}
-      style={won ? { borderColor: "var(--accent)", boxShadow: "0 0 0 4px var(--accent-soft), var(--shadow-lg)" } : undefined}
-    >
-      <div className="portrait-bright aspect-[3/4] sm:aspect-[4/5] w-full">
-        {figure.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={figure.image_url}
-            alt={figure.name}
-            className="h-full w-full object-cover"
-            loading="eager"
-            draggable={false}
-          />
-        ) : (
-          <div className="h-full w-full grid place-items-center bg-[#f4f4f5] text-muted text-xs uppercase tracking-widest">
-            no portrait
-          </div>
-        )}
-      </div>
-
-      <div className="px-5 sm:px-6 py-4 sm:py-5">
-        <h2 className="serif text-2xl sm:text-3xl leading-tight text-foreground">
-          {figure.name}
-        </h2>
-        <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mt-1">
-          {formatYears(figure.birth_year, figure.death_year) ?? "—"}
+    <div className="relative">
+      <button
+        type="button"
+        aria-label={`Vote ${figure.name} as having more aura`}
+        onClick={onClick}
+        disabled={disabled}
+        className={`card-bright group relative text-left overflow-hidden w-full ${
+          disabled ? "cursor-default" : "cursor-pointer active:scale-[0.985]"
+        } ${won ? "ring-4 ring-offset-2 ring-offset-background" : ""} ${lost ? "opacity-50" : ""}`}
+        style={won ? { borderColor: "var(--accent)", boxShadow: "0 0 0 4px var(--accent-soft), var(--shadow-lg)" } : undefined}
+      >
+        <div className="portrait-bright aspect-[3/4] sm:aspect-[4/5] w-full">
+          {figure.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={figure.image_url}
+              alt={figure.name}
+              className="h-full w-full object-cover"
+              loading="eager"
+              draggable={false}
+            />
+          ) : (
+            <div className="h-full w-full grid place-items-center bg-[#f4f4f5] text-muted text-xs uppercase tracking-widest">
+              no portrait
+            </div>
+          )}
         </div>
-        <FigureBlurb text={figure.short_blurb} />
-      </div>
 
-      <AnimatePresence>
-        {delta !== null && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45, type: "spring", stiffness: 220, damping: 18 }}
-            className={`absolute top-4 ${side === "left" ? "left-4" : "right-4"} z-20`}
-          >
-            <span
-              className={`inline-flex items-center px-3 py-1.5 rounded-full text-base sm:text-lg font-bold tabular-nums shadow-lg ${
-                delta >= 0 ? "bg-gradient text-white" : "bg-white text-foreground/60 border border-line"
-              }`}
+        <div className="px-5 sm:px-6 py-4 sm:py-5">
+          <h2 className="serif text-2xl sm:text-3xl leading-tight text-foreground">
+            {figure.name}
+          </h2>
+          <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mt-1">
+            {formatYears(figure.birth_year, figure.death_year) ?? "—"}
+          </div>
+          <FigureBlurb text={figure.short_blurb} />
+        </div>
+
+        <AnimatePresence>
+          {delta !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45, type: "spring", stiffness: 220, damping: 18 }}
+              className={`absolute top-4 ${side === "left" ? "left-4" : "right-4"} z-20`}
             >
-              {delta >= 0 ? "+" : ""}
-              {Math.round(delta)}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
+              <span
+                className={`inline-flex items-center px-3 py-1.5 rounded-full text-base sm:text-lg font-bold tabular-nums shadow-lg ${
+                  delta >= 0 ? "bg-gradient text-white" : "bg-white text-foreground/60 border border-line"
+                }`}
+              >
+                {delta >= 0 ? "+" : ""}
+                {Math.round(delta)}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </button>
+
+      <SocialLink url={figure.social_url} kind={figure.social_kind} name={figure.name} />
+    </div>
   );
 }
 

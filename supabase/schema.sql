@@ -17,6 +17,8 @@ create table if not exists figures (
 
 -- Backfill the column on existing installs that predated it.
 alter table figures add column if not exists category text not null default 'historical';
+alter table figures add column if not exists social_url text;
+alter table figures add column if not exists social_kind text;
 
 create table if not exists matches (
   id uuid primary key default gen_random_uuid(),

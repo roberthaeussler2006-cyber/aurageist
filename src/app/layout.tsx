@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,11 +25,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        <main className="flex-1 flex flex-col">{children}</main>
-        <footer className="px-5 sm:px-8 py-4 text-[10px] uppercase tracking-[0.18em] font-semibold text-muted/70 text-center">
-          portraits via wikipedia · elo updates live
-        </footer>
+        <AuthProvider>
+          <SiteHeader />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <footer className="px-5 sm:px-8 py-4 text-[10px] uppercase tracking-[0.18em] font-semibold text-muted/70 text-center">
+            portraits via wikipedia · elo updates live
+          </footer>
+        </AuthProvider>
       </body>
     </html>
   );

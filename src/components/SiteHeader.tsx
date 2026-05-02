@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 
 export function SiteHeader() {
   const pathname = usePathname() ?? "/";
@@ -10,6 +11,7 @@ export function SiteHeader() {
   const otherMatchupHref = onCurrent ? "/" : "/current";
   const otherLabel = onCurrent ? "historical" : "current";
   const leaderboardHref = onCurrent ? "/leaderboard/current" : "/leaderboard";
+  const { user, signOut, loading } = useAuth();
 
   return (
     <header className="px-5 sm:px-8 pt-5 sm:pt-7 pb-2 flex items-center justify-between gap-3">
@@ -23,6 +25,25 @@ export function SiteHeader() {
         <Link href={leaderboardHref} className="hover:text-accent transition-colors">
           Leaderboard
         </Link>
+        {!loading && user && (
+          <Link href="/leaderboard/personal" className="hover:text-accent transition-colors">
+            Mine
+          </Link>
+        )}
+        {!loading && (user ? (
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="hover:text-accent transition-colors uppercase tracking-[0.2em]"
+            title={user.email ?? undefined}
+          >
+            Sign out
+          </button>
+        ) : (
+          <Link href="/auth" className="hover:text-accent transition-colors">
+            Sign in
+          </Link>
+        ))}
       </nav>
     </header>
   );

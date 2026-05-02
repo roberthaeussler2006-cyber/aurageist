@@ -1,5 +1,14 @@
 export type Category = "historical" | "current";
 
+export type SocialKind =
+  | "instagram"
+  | "x"
+  | "tiktok"
+  | "youtube"
+  | "threads"
+  | "facebook"
+  | "website";
+
 export type Figure = {
   id: string;
   name: string;
@@ -13,6 +22,8 @@ export type Figure = {
   matches: number;
   wins: number;
   created_at: string;
+  social_url: string | null;
+  social_kind: SocialKind | "none" | null;
 };
 
 export type MatchRecord = {
@@ -32,6 +43,8 @@ export type MatchupResponse = {
 export type VoteResponse = {
   winnerNewElo: number;
   loserNewElo: number;
+  personalWinnerNewElo: number | null;
+  personalLoserNewElo: number | null;
 };
 
 export type RecentMatch = {
