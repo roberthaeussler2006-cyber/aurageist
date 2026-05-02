@@ -36,8 +36,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <AuthProvider>
           <SiteHeader />
           <main className="flex-1 flex flex-col">{children}</main>
-          <footer className="px-5 sm:px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 text-center">
-            portraits via wikipedia · elo updates live
+          <footer className="px-5 sm:px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted/70 text-center flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span>portraits via wikipedia</span>
+            <span aria-hidden className="text-muted/30">·</span>
+            <span>elo updates live</span>
+            <span aria-hidden className="text-muted/30">·</span>
+            <span title="for marc — yes the 67 is on purpose" className="tracking-[0.3em]">67</span>
           </footer>
         </AuthProvider>
       </body>
