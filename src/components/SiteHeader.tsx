@@ -35,7 +35,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => signOut()}
             className="hover:text-accent transition-colors uppercase tracking-[0.2em]"
-            title={user.email ?? undefined}
+            title={(user.user_metadata?.username as string | undefined) ?? user.email ?? undefined}
           >
             Sign out
           </button>
