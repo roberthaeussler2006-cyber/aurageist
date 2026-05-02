@@ -241,6 +241,12 @@ function PairLayout({
           </svg>
           Skip
         </button>
+        <Link
+          href={`/vs/${encodeURIComponent(a.wiki_slug)}/${encodeURIComponent(b.wiki_slug)}`}
+          className="btn-ghost"
+        >
+          Share
+        </Link>
       </div>
 
       <div className="md:tilt-right flex flex-col">
