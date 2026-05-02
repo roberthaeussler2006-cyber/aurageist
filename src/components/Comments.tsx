@@ -11,12 +11,33 @@ type Comment = {
   author_name: string;
   body: string;
   created_at: string;
+  upvotes: number;
 };
 
 const MAX_LEN = 1000;
 const MAX_NAME_LEN = 40;
 const COMPACT_LIMIT = 5;
 const NAME_KEY = "aurageist-anon-name";
+const UPVOTES_KEY = "aurageist-upvoted";
+
+function getUpvotedSet(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(UPVOTES_KEY);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveUpvotedSet(s: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(UPVOTES_KEY, JSON.stringify(Array.from(s)));
+  } catch {
+    // ignore quota errors
+  }
+}
 
 export function Comments({
   figureId,
@@ -29,17 +50,44 @@ export function Comments({
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [upvoted, setUpvoted] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = window.localStorage.getItem(NAME_KEY);
     if (saved) setName(saved);
+    setUpvoted(getUpvotedSet());
   }, []);
+
+  const upvote = useCallback(async (commentId: string) => {
+    if (upvoted.has(commentId)) return;
+    const next = new Set(upvoted);
+    next.add(commentId);
+    setUpvoted(next);
+    saveUpvotedSet(next);
+    setComments((prev) =>
+      prev ? prev.map((c) => (c.id === commentId ? { ...c, upvotes: c.upvotes + 1 } : c)) : prev,
+    );
+    const { error } = await getBrowserSupabase().rpc("increment_comment_upvote", {
+      p_comment_id: commentId,
+    });
+    if (error) {
+      const rollback = new Set(next);
+      rollback.delete(commentId);
+      setUpvoted(rollback);
+      saveUpvotedSet(rollback);
+      setComments((prev) =>
+        prev
+          ? prev.map((c) => (c.id === commentId ? { ...c, upvotes: Math.max(0, c.upvotes - 1) } : c))
+          : prev,
+      );
+    }
+  }, [upvoted]);
 
   const load = useCallback(async () => {
     const { data, error } = await getBrowserSupabase()
       .from("comments")
-      .select("id,user_id,parent_id,author_name,body,created_at")
+      .select("id,user_id,parent_id,author_name,body,created_at,upvotes")
       .eq("figure_id", figureId)
       .order("created_at", { ascending: false })
       .limit(400);
@@ -92,7 +140,9 @@ export function Comments({
     setComments((prev) => (prev ? prev.filter((c) => c.id !== id && c.parent_id !== id) : prev));
   };
 
-  const roots = (comments ?? []).filter((c) => !c.parent_id);
+  const roots = (comments ?? [])
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => b.upvotes - a.upvotes || b.created_at.localeCompare(a.created_at));
   const repliesByParent = new Map<string, Comment[]>();
   for (const c of comments ?? []) {
     if (!c.parent_id) continue;
@@ -144,6 +194,8 @@ export function Comments({
               replies={repliesByParent.get(c.id) ?? []}
               onReply={(text) => post(text, c.id)}
               onDelete={remove}
+              onUpvote={upvote}
+              hasUpvoted={upvoted.has(c.id)}
               currentUserId={user?.id ?? null}
               showNameField={!user}
               name={name}
@@ -166,6 +218,8 @@ function CommentItem({
   replies,
   onReply,
   onDelete,
+  onUpvote,
+  hasUpvoted,
   currentUserId,
   showNameField,
   name,
@@ -175,6 +229,8 @@ function CommentItem({
   replies: Comment[];
   onReply: (text: string) => Promise<string | null>;
   onDelete: (id: string) => void;
+  onUpvote: (id: string) => void;
+  hasUpvoted: boolean;
   currentUserId: string | null;
   showNameField: boolean;
   name: string;
@@ -187,6 +243,18 @@ function CommentItem({
     <li className="rounded-2xl bg-panel border border-line px-4 py-3 shadow-sm">
       <CommentBody comment={comment} isOwn={isOwn} onDelete={onDelete} />
       <div className="flex items-center gap-3 mt-2">
+        <button
+          type="button"
+          onClick={() => onUpvote(comment.id)}
+          disabled={hasUpvoted}
+          aria-pressed={hasUpvoted}
+          className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] font-semibold transition-colors ${
+            hasUpvoted ? "text-accent cursor-default" : "text-muted hover:text-accent"
+          }`}
+        >
+          <span aria-hidden>{hasUpvoted ? "♥" : "♡"}</span>
+          {comment.upvotes > 0 ? comment.upvotes : "like"}
+        </button>
         <button
           type="button"
           onClick={() => setReplyOpen((v) => !v)}

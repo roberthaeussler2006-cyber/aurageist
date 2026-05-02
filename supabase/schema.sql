@@ -91,6 +91,23 @@ create table if not exists comments (
 -- on installs that ran the earlier version of this schema.
 alter table comments alter column user_id drop not null;
 alter table comments add column if not exists parent_id uuid references comments(id) on delete cascade;
+alter table comments add column if not exists upvotes int not null default 0;
+
+create or replace function increment_comment_upvote(p_comment_id uuid)
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_new int;
+begin
+  update comments set upvotes = upvotes + 1 where id = p_comment_id returning upvotes into v_new;
+  return v_new;
+end;
+$$;
+
+grant execute on function increment_comment_upvote(uuid) to anon, authenticated;
 create index if not exists comments_parent_idx on comments (parent_id);
 create index if not exists comments_figure_root_created_idx
   on comments (figure_id, created_at desc)
