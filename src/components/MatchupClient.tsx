@@ -11,6 +11,7 @@ import { SocialLink } from "./SocialLink";
 import { useAuth } from "./AuthProvider";
 import { Comments } from "./Comments";
 import { dispatchStreakRefresh } from "./StreakBadge";
+import { useControversyImage } from "./ControversyImage";
 
 type VoteResult = {
   winnerId: string;
@@ -371,6 +372,20 @@ function FigureChoice({
     ? { borderColor: "var(--accent)", boxShadow: "0 0 0 6px var(--accent-soft), 0 60px 140px -30px var(--accent-glow), 0 1px 0 rgba(255,255,255,0.6) inset" }
     : undefined;
 
+  const controversy = useControversyImage(figure.wiki_slug);
+  const [showControversy, setShowControversy] = useState(false);
+
+  // If the user toggles to the controversy view, then the next matchup
+  // arrives, reset back to portrait.
+  useEffect(() => {
+    setShowControversy(false);
+  }, [figure.id]);
+
+  const mainSrc =
+    showControversy && controversy.available ? controversy.url : figure.image_url;
+  const peekSrc =
+    showControversy && controversy.available ? figure.image_url : controversy.url;
+
   return (
     <div className="relative">
       <button
@@ -384,9 +399,10 @@ function FigureChoice({
         style={wonStyle}
       >
         <div className="portrait-frame aspect-[3/4] sm:aspect-[4/5] w-full relative">
-          {figure.image_url ? (
+          {mainSrc ? (
             <Image
-              src={figure.image_url}
+              key={mainSrc}
+              src={mainSrc}
               alt={figure.name}
               fill
               priority
@@ -394,6 +410,7 @@ function FigureChoice({
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 480px"
               className="object-cover"
               draggable={false}
+              unoptimized={showControversy}
             />
           ) : (
             <div className="h-full w-full grid place-items-center bg-white/40 text-muted text-xs uppercase tracking-widest">
@@ -405,6 +422,28 @@ function FigureChoice({
               {side === "left" ? "← Left" : "Right →"}
             </span>
           </div>
+          {controversy.available && peekSrc && (
+            <button
+              type="button"
+              aria-label={`Show ${showControversy ? "portrait" : "iconic moment"} of ${figure.name}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setShowControversy((s) => !s);
+              }}
+              className={`absolute bottom-3 ${
+                side === "left" ? "right-3" : "left-3"
+              } z-30 h-12 w-12 sm:h-16 sm:w-16 rounded-2xl overflow-hidden ring-2 ring-white shadow-lg hover:scale-105 active:scale-95 transition-transform`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={peekSrc}
+                alt=""
+                className="h-full w-full object-cover"
+                draggable={false}
+              />
+            </button>
+          )}
         </div>
 
         <div className="px-3 py-3 sm:px-7 sm:py-6">

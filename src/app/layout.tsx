@@ -42,8 +42,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span>portraits via wikipedia</span>
             <span aria-hidden className="text-muted/30">·</span>
             <span>elo updates live</span>
-            <span aria-hidden className="text-muted/30">·</span>
-            <span title="for marc — yes the 67 is on purpose" className="tracking-[0.3em]">67</span>
           </footer>
           <BrainrotPanel />
           <SlotMachine />

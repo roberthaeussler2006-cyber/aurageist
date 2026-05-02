@@ -7,6 +7,7 @@ import { formatYears } from "@/components/FigureBlurb";
 import { SocialLink } from "@/components/SocialLink";
 import { Comments } from "@/components/Comments";
 import { formatMoney, moneyBarPct } from "@/lib/money";
+import { KnownForBlock } from "@/components/KnownForBlock";
 
 export const dynamic = "force-dynamic";
 
@@ -50,21 +51,26 @@ export default async function FigurePage({
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 sm:gap-10 mt-6">
-          <div className="portrait-bright aspect-[3/4] w-full md:w-[280px] rounded-3xl overflow-hidden shadow-[var(--shadow)] relative">
-            {figure.image_url ? (
-              <Image
-                src={figure.image_url}
-                alt={figure.name}
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(max-width: 768px) 100vw, 280px"
-                className="object-cover"
-              />
-            ) : (
-              <div className="h-full w-full bg-[#f4f4f5] grid place-items-center text-muted text-xs uppercase tracking-widest">
-                no portrait
-              </div>
+          <div className="md:w-[280px]">
+            <div className="portrait-bright aspect-[3/4] w-full md:w-[280px] rounded-3xl overflow-hidden shadow-[var(--shadow)] relative">
+              {figure.image_url ? (
+                <Image
+                  src={figure.image_url}
+                  alt={figure.name}
+                  fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 100vw, 280px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-[#f4f4f5] grid place-items-center text-muted text-xs uppercase tracking-widest">
+                  no portrait
+                </div>
+              )}
+            </div>
+            {figure.category === "current" && (
+              <KnownForBlock wikiSlug={figure.wiki_slug} name={figure.name} />
             )}
           </div>
 
