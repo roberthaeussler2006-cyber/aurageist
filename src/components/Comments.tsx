@@ -51,6 +51,7 @@ export function Comments({
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [upvoted, setUpvoted] = useState<Set<string>>(new Set());
+  const [sort, setSort] = useState<"top" | "newest">("top");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -142,7 +143,11 @@ export function Comments({
 
   const roots = (comments ?? [])
     .filter((c) => !c.parent_id)
-    .sort((a, b) => b.upvotes - a.upvotes || b.created_at.localeCompare(a.created_at));
+    .sort((a, b) =>
+      sort === "newest"
+        ? b.created_at.localeCompare(a.created_at)
+        : b.upvotes - a.upvotes || b.created_at.localeCompare(a.created_at),
+    );
   const repliesByParent = new Map<string, Comment[]>();
   for (const c of comments ?? []) {
     if (!c.parent_id) continue;
