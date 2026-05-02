@@ -19,7 +19,7 @@ const supabase = createClient(SUPABASE_URL, KEY, {
   auth: { persistSession: false },
 });
 
-type Row = { name: string; wiki_slug: string };
+type Row = { name: string; wiki_slug: string; category?: string };
 
 type WikiSummary = {
   extract?: string;
@@ -123,6 +123,7 @@ async function processOne(row: Row): Promise<void> {
           short_blurb: blurb,
           birth_year: birth,
           death_year: death,
+          category: row.category ?? "historical",
         },
         { onConflict: "name" },
       );

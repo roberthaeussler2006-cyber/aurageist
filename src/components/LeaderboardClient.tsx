@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { Figure } from "@/lib/types";
+import type { Category, Figure } from "@/lib/types";
 import { formatYears } from "./FigureBlurb";
 
 type Sort = "elo" | "matches" | "winrate";
@@ -15,7 +15,7 @@ const TABS: { id: Sort; label: string }[] = [
   { id: "winrate", label: "Highest win rate" },
 ];
 
-export function LeaderboardClient() {
+export function LeaderboardClient({ category = "historical" }: { category?: Category }) {
   const [sort, setSort] = useState<Sort>("elo");
   const [figures, setFigures] = useState<Figure[]>([]);
   const [status, setStatus] = useState<Status>("loading");
@@ -23,7 +23,7 @@ export function LeaderboardClient() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`/api/leaderboard?limit=50&sort=${sort}`, { signal: controller.signal })
+    fetch(`/api/leaderboard?limit=50&sort=${sort}&cat=${category}`, { signal: controller.signal })
       .then(async (r) => {
         if (!r.ok) throw new Error(`status ${r.status}`);
         const j = (await r.json()) as { figures: Figure[] };
@@ -36,7 +36,7 @@ export function LeaderboardClient() {
         setStatus("error");
       });
     return () => controller.abort();
-  }, [sort]);
+  }, [sort, category]);
 
   function pickSort(next: Sort) {
     if (next === sort) return;

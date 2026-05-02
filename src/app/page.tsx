@@ -1,5 +1,5 @@
 import { MatchupClient } from "@/components/MatchupClient";
 
 export default function HomePage() {
-  return <MatchupClient />;
+  return <MatchupClient category="historical" />;
 }

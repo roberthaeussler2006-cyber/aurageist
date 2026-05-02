@@ -1,3 +1,5 @@
+export type Category = "historical" | "current";
+
 export type Figure = {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export type Figure = {
   birth_year: number | null;
   death_year: number | null;
   short_blurb: string | null;
+  category: Category;
   elo: number;
   matches: number;
   wins: number;

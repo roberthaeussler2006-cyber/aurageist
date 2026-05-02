@@ -35,10 +35,13 @@ export default async function FigurePage({
   const winRate = matches > 0 ? Math.round((wins / matches) * 100) : 0;
   const elo = Math.round(Number(figure.elo));
 
+  const leaderboardHref = figure.category === "current" ? "/leaderboard/current" : "/leaderboard";
+  const matchupHref = figure.category === "current" ? "/current" : "/";
+
   return (
     <div className="px-4 sm:px-8 pb-16 pt-2">
       <div className="max-w-4xl mx-auto">
-        <Link href="/leaderboard" className="text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent">
+        <Link href={leaderboardHref} className="text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent">
           ← back to leaderboard
         </Link>
 
@@ -55,8 +58,10 @@ export default async function FigurePage({
           </div>
 
           <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-muted">
-              rank #{rank}
+            <div className="text-[10px] uppercase tracking-[0.3em] text-muted flex items-center gap-3">
+              <span className="text-accent">{figure.category === "current" ? "Current" : "Historical"}</span>
+              <span className="text-muted/40">·</span>
+              <span>rank #{rank}</span>
             </div>
             <h1 className="serif text-4xl sm:text-5xl italic mt-1">{figure.name}</h1>
             <div className="text-xs uppercase tracking-[0.2em] text-muted mt-2">
@@ -117,7 +122,7 @@ export default async function FigurePage({
 
         <div className="mt-12 text-center">
           <Link
-            href="/"
+            href={matchupHref}
             className="inline-block px-6 py-3 border border-accent/60 text-accent uppercase tracking-[0.25em] text-xs hover:bg-accent/10 transition-colors"
           >
             Vote in a new matchup

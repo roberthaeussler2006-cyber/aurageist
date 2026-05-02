@@ -40,6 +40,24 @@ export async function POST(req: Request) {
   const sessionId = await ensureSessionId();
   const supabase = getServerSupabase();
 
+  // Defence-in-depth: in addition to token signing, verify both figures share
+  // a category. The matchup endpoint only ever pairs figures within the same
+  // category, but this stops any future bug or replayed token from leaking
+  // votes across the historical/current divide.
+  const { data: figs, error: figErr } = await supabase
+    .from("figures")
+    .select("id, category")
+    .in("id", [body.winnerId, body.loserId]);
+  if (figErr) {
+    return NextResponse.json({ error: figErr.message }, { status: 500 });
+  }
+  if (!figs || figs.length !== 2) {
+    return NextResponse.json({ error: "figure not found" }, { status: 400 });
+  }
+  if (figs[0].category !== figs[1].category) {
+    return NextResponse.json({ error: "figures must share a category" }, { status: 400 });
+  }
+
   const { data, error } = await supabase.rpc("record_vote", {
     p_winner_id: body.winnerId,
     p_loser_id: body.loserId,

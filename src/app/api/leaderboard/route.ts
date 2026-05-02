@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase";
+import { parseCategory } from "@/lib/category";
 
 export const revalidate = 30;
 
@@ -8,16 +9,14 @@ export async function GET(req: Request) {
   const limit = clamp(parseInt(url.searchParams.get("limit") ?? "50", 10) || 50, 1, 200);
   const offset = clamp(parseInt(url.searchParams.get("offset") ?? "0", 10) || 0, 0, 10_000);
   const sort = url.searchParams.get("sort") ?? "elo";
+  const category = parseCategory(url.searchParams.get("cat"));
 
   const supabase = getServerSupabase();
-  let query = supabase.from("figures").select("*");
+  let query = supabase.from("figures").select("*").eq("category", category);
 
   if (sort === "matches") {
     query = query.order("matches", { ascending: false }).order("elo", { ascending: false });
   } else if (sort === "winrate") {
-    // Win-rate sort with a 20-match floor — cheaper to filter and sort by Elo
-    // here than to compute (wins::float/matches) in SQL via a view. The
-    // frontend computes the actual % from the wins/matches fields.
     query = query.gte("matches", 20).order("wins", { ascending: false });
   } else {
     query = query.order("elo", { ascending: false });

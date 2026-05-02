@@ -1,231 +1,171 @@
-name,wiki_slug
-Alexander the Great,Alexander_the_Great
-Julius Caesar,Julius_Caesar
-Genghis Khan,Genghis_Khan
-Napoleon Bonaparte,Napoleon
-Attila,Attila
-Hannibal,Hannibal
-Saladin,Saladin
-Tamerlane,Timur
-Charlemagne,Charlemagne
-William the Conqueror,William_the_Conqueror
-Spartacus,Spartacus
-Suleiman the Magnificent,Suleiman_the_Magnificent
-Mehmed the Conqueror,Mehmed_II
-Vlad the Impaler,Vlad_the_Impaler
-Richard I of England,Richard_I_of_England
-Kublai Khan,Kublai_Khan
-Shaka,Shaka
-Babur,Babur
-Hernán Cortés,Hernán_Cortés
-Francisco Pizarro,Francisco_Pizarro
-Leonidas I,Leonidas_I
-Pericles,Pericles
-Pompey,Pompey
-Mark Antony,Mark_Antony
-Belisarius,Belisarius
-Subutai,Subutai
-Augustus,Augustus
-Nero,Nero
-Caligula,Caligula
-Marcus Aurelius,Marcus_Aurelius
-Constantine the Great,Constantine_the_Great
-Trajan,Trajan
-Hadrian,Hadrian
-Justinian I,Justinian_I
-Henry VIII,Henry_VIII
-Louis XIV,Louis_XIV
-Peter the Great,Peter_the_Great
-Ivan the Terrible,Ivan_the_Terrible
-Frederick the Great,Frederick_the_Great
-Akbar,Akbar
-Qin Shi Huang,Qin_Shi_Huang
-Ramesses II,Ramesses_II
-Tutankhamun,Tutankhamun
-Hammurabi,Hammurabi
-Ashoka,Ashoka
-Cyrus the Great,Cyrus_the_Great
-Darius the Great,Darius_the_Great
-Xerxes I,Xerxes_I
-Solomon,Solomon
-David,David
-Nebuchadnezzar II,Nebuchadnezzar_II
-Hirohito,Hirohito
-Haile Selassie,Haile_Selassie
-Jesus,Jesus
-Muhammad,Muhammad
-Gautama Buddha,Gautama_Buddha
-Moses,Moses
-Abraham,Abraham
-Confucius,Confucius
-Laozi,Laozi
-Zoroaster,Zoroaster
-Martin Luther,Martin_Luther
-Pope John Paul II,Pope_John_Paul_II
-14th Dalai Lama,14th_Dalai_Lama
-Grigori Rasputin,Grigori_Rasputin
-Thomas Aquinas,Thomas_Aquinas
-Rumi,Rumi
-Girolamo Savonarola,Girolamo_Savonarola
-Augustine of Hippo,Augustine_of_Hippo
-Socrates,Socrates
-Plato,Plato
-Aristotle,Aristotle
-Diogenes,Diogenes
-Pythagoras,Pythagoras
-Seneca the Younger,Seneca_the_Younger
-Niccolò Machiavelli,Niccolò_Machiavelli
-René Descartes,René_Descartes
-Immanuel Kant,Immanuel_Kant
-Friedrich Nietzsche,Friedrich_Nietzsche
-Karl Marx,Karl_Marx
-Voltaire,Voltaire
-Jean-Jacques Rousseau,Jean-Jacques_Rousseau
-Arthur Schopenhauer,Arthur_Schopenhauer
-Sun Tzu,Sun_Tzu
-Sigmund Freud,Sigmund_Freud
-Carl Jung,Carl_Jung
-Jean-Paul Sartre,Jean-Paul_Sartre
-Søren Kierkegaard,Søren_Kierkegaard
-John Locke,John_Locke
-David Hume,David_Hume
-Georg Wilhelm Friedrich Hegel,Georg_Wilhelm_Friedrich_Hegel
-Ibn Khaldun,Ibn_Khaldun
-Leonardo da Vinci,Leonardo_da_Vinci
-Isaac Newton,Isaac_Newton
-Albert Einstein,Albert_Einstein
-Galileo Galilei,Galileo_Galilei
-Nikola Tesla,Nikola_Tesla
-Thomas Edison,Thomas_Edison
-Charles Darwin,Charles_Darwin
-Nicolaus Copernicus,Nicolaus_Copernicus
-Archimedes,Archimedes
-Alan Turing,Alan_Turing
-Stephen Hawking,Stephen_Hawking
-Louis Pasteur,Louis_Pasteur
-Niels Bohr,Niels_Bohr
-J. Robert Oppenheimer,J._Robert_Oppenheimer
-Wernher von Braun,Wernher_von_Braun
-Gregor Mendel,Gregor_Mendel
-Carl Sagan,Carl_Sagan
-Michael Faraday,Michael_Faraday
-James Clerk Maxwell,James_Clerk_Maxwell
-Johannes Kepler,Johannes_Kepler
-Euclid,Euclid
-Richard Feynman,Richard_Feynman
-Michelangelo,Michelangelo
-Raphael,Raphael
-Caravaggio,Caravaggio
-Rembrandt,Rembrandt
-Vincent van Gogh,Vincent_van_Gogh
-Pablo Picasso,Pablo_Picasso
-Salvador Dalí,Salvador_Dalí
-Andy Warhol,Andy_Warhol
-William Shakespeare,William_Shakespeare
-Dante Alighieri,Dante_Alighieri
-Homer,Homer
-Johann Wolfgang von Goethe,Johann_Wolfgang_von_Goethe
-Leo Tolstoy,Leo_Tolstoy
-Fyodor Dostoevsky,Fyodor_Dostoevsky
-Edgar Allan Poe,Edgar_Allan_Poe
-Ernest Hemingway,Ernest_Hemingway
-Oscar Wilde,Oscar_Wilde
-Ludwig van Beethoven,Ludwig_van_Beethoven
-Wolfgang Amadeus Mozart,Wolfgang_Amadeus_Mozart
-Johann Sebastian Bach,Johann_Sebastian_Bach
-Richard Wagner,Richard_Wagner
-Frédéric Chopin,Frédéric_Chopin
-Franz Liszt,Franz_Liszt
-Virgil,Virgil
-Lord Byron,Lord_Byron
-George Washington,George_Washington
-Abraham Lincoln,Abraham_Lincoln
-Thomas Jefferson,Thomas_Jefferson
-Benjamin Franklin,Benjamin_Franklin
-Mahatma Gandhi,Mahatma_Gandhi
-Nelson Mandela,Nelson_Mandela
-Martin Luther King Jr.,Martin_Luther_King_Jr.
-Malcolm X,Malcolm_X
-Che Guevara,Che_Guevara
-Fidel Castro,Fidel_Castro
-Simón Bolívar,Simón_Bolívar
-Vladimir Lenin,Vladimir_Lenin
-Leon Trotsky,Leon_Trotsky
-Joseph Stalin,Joseph_Stalin
-Mao Zedong,Mao_Zedong
-Maximilien Robespierre,Maximilien_Robespierre
-Giuseppe Garibaldi,Giuseppe_Garibaldi
-John F. Kennedy,John_F._Kennedy
-Robert F. Kennedy,Robert_F._Kennedy
-Theodore Roosevelt,Theodore_Roosevelt
-Adolf Hitler,Adolf_Hitler
-Benito Mussolini,Benito_Mussolini
-Pol Pot,Pol_Pot
-Saddam Hussein,Saddam_Hussein
-Muammar Gaddafi,Muammar_Gaddafi
-Ruhollah Khomeini,Ruhollah_Khomeini
-Idi Amin,Idi_Amin
-Kim Il Sung,Kim_Il_Sung
-Kim Jong Il,Kim_Jong_Il
-Francisco Franco,Francisco_Franco
-Augusto Pinochet,Augusto_Pinochet
-Josip Broz Tito,Josip_Broz_Tito
-Nicolae Ceaușescu,Nicolae_Ceaușescu
-Hideki Tojo,Hideki_Tojo
-Joseph Goebbels,Joseph_Goebbels
-Heinrich Himmler,Heinrich_Himmler
-Hermann Göring,Hermann_Göring
-Adolf Eichmann,Adolf_Eichmann
-Josef Mengele,Josef_Mengele
-Osama bin Laden,Osama_bin_Laden
-Slobodan Milošević,Slobodan_Milošević
-Winston Churchill,Winston_Churchill
-Franklin D. Roosevelt,Franklin_D._Roosevelt
-Charles de Gaulle,Charles_de_Gaulle
-Dwight D. Eisenhower,Dwight_D._Eisenhower
-George S. Patton,George_S._Patton
-Erwin Rommel,Erwin_Rommel
-Douglas MacArthur,Douglas_MacArthur
-Ronald Reagan,Ronald_Reagan
-Richard Nixon,Richard_Nixon
-Mikhail Gorbachev,Mikhail_Gorbachev
-Boris Yeltsin,Boris_Yeltsin
-Vladimir Putin,Vladimir_Putin
-Lyndon B. Johnson,Lyndon_B._Johnson
-Harry S. Truman,Harry_S._Truman
-Giacomo Casanova,Giacomo_Casanova
-Edward Teach,Edward_Teach
-Harry Houdini,Harry_Houdini
-Nostradamus,Nostradamus
-Aleister Crowley,Aleister_Crowley
-Billy the Kid,Billy_the_Kid
-Jesse James,Jesse_James
-Al Capone,Al_Capone
-Pablo Escobar,Pablo_Escobar
-Lucky Luciano,Lucky_Luciano
-John Dillinger,John_Dillinger
-Jack the Ripper,Jack_the_Ripper
-Charles Manson,Charles_Manson
-Ted Bundy,Ted_Bundy
-H. H. Holmes,H._H._Holmes
-Christopher Columbus,Christopher_Columbus
-Marco Polo,Marco_Polo
-Ferdinand Magellan,Ferdinand_Magellan
-Vasco da Gama,Vasco_da_Gama
-James Cook,James_Cook
-Roald Amundsen,Roald_Amundsen
-Ernest Shackleton,Ernest_Shackleton
-Neil Armstrong,Neil_Armstrong
-Yuri Gagarin,Yuri_Gagarin
-Edmund Hillary,Edmund_Hillary
-Muhammad Ali,Muhammad_Ali
-Pelé,Pelé
-Diego Maradona,Diego_Maradona
-Babe Ruth,Babe_Ruth
-Bruce Lee,Bruce_Lee
-Elvis Presley,Elvis_Presley
-John Lennon,John_Lennon
-Bob Marley,Bob_Marley
-James Dean,James_Dean
-Charlie Chaplin,Charlie_Chaplin
-Steve Jobs,Steve_Jobs
+name,wiki_slug,category
+Jesus,Jesus,historical
+Muhammad,Muhammad,historical
+Gautama Buddha,Gautama_Buddha,historical
+Moses,Moses,historical
+Alexander the Great,Alexander_the_Great,historical
+Julius Caesar,Julius_Caesar,historical
+Cleopatra,Cleopatra,historical
+Aristotle,Aristotle,historical
+Plato,Plato,historical
+Socrates,Socrates,historical
+Confucius,Confucius,historical
+Homer,Homer,historical
+Archimedes,Archimedes,historical
+Tutankhamun,Tutankhamun,historical
+Hannibal,Hannibal,historical
+Genghis Khan,Genghis_Khan,historical
+Attila,Attila,historical
+Joan of Arc,Joan_of_Arc,historical
+Marco Polo,Marco_Polo,historical
+Christopher Columbus,Christopher_Columbus,historical
+Leonardo da Vinci,Leonardo_da_Vinci,historical
+Michelangelo,Michelangelo,historical
+Galileo Galilei,Galileo_Galilei,historical
+William Shakespeare,William_Shakespeare,historical
+Henry VIII,Henry_VIII,historical
+Napoleon Bonaparte,Napoleon,historical
+Isaac Newton,Isaac_Newton,historical
+Wolfgang Amadeus Mozart,Wolfgang_Amadeus_Mozart,historical
+Ludwig van Beethoven,Ludwig_van_Beethoven,historical
+Johann Sebastian Bach,Johann_Sebastian_Bach,historical
+George Washington,George_Washington,historical
+Abraham Lincoln,Abraham_Lincoln,historical
+Benjamin Franklin,Benjamin_Franklin,historical
+Thomas Jefferson,Thomas_Jefferson,historical
+Karl Marx,Karl_Marx,historical
+Charles Darwin,Charles_Darwin,historical
+Vincent van Gogh,Vincent_van_Gogh,historical
+Nikola Tesla,Nikola_Tesla,historical
+Thomas Edison,Thomas_Edison,historical
+Albert Einstein,Albert_Einstein,historical
+Sigmund Freud,Sigmund_Freud,historical
+Mahatma Gandhi,Mahatma_Gandhi,historical
+Adolf Hitler,Adolf_Hitler,historical
+Joseph Stalin,Joseph_Stalin,historical
+Mao Zedong,Mao_Zedong,historical
+Benito Mussolini,Benito_Mussolini,historical
+Vladimir Lenin,Vladimir_Lenin,historical
+Winston Churchill,Winston_Churchill,historical
+Franklin D. Roosevelt,Franklin_D._Roosevelt,historical
+John F. Kennedy,John_F._Kennedy,historical
+Martin Luther King Jr.,Martin_Luther_King_Jr.,historical
+Nelson Mandela,Nelson_Mandela,historical
+Ronald Reagan,Ronald_Reagan,historical
+Vladimir Putin,Vladimir_Putin,historical
+Fidel Castro,Fidel_Castro,historical
+Che Guevara,Che_Guevara,historical
+Saddam Hussein,Saddam_Hussein,historical
+Osama bin Laden,Osama_bin_Laden,historical
+Pablo Picasso,Pablo_Picasso,historical
+Charlie Chaplin,Charlie_Chaplin,historical
+Elvis Presley,Elvis_Presley,historical
+John Lennon,John_Lennon,historical
+Bob Marley,Bob_Marley,historical
+Bruce Lee,Bruce_Lee,historical
+Muhammad Ali,Muhammad_Ali,historical
+Pelé,Pelé,historical
+Diego Maradona,Diego_Maradona,historical
+Steve Jobs,Steve_Jobs,historical
+Stephen Hawking,Stephen_Hawking,historical
+Neil Armstrong,Neil_Armstrong,historical
+Al Capone,Al_Capone,historical
+Pablo Escobar,Pablo_Escobar,historical
+Donald Trump,Donald_Trump,current
+Joe Biden,Joe_Biden,current
+Barack Obama,Barack_Obama,current
+Hillary Clinton,Hillary_Clinton,current
+Bernie Sanders,Bernie_Sanders,current
+Alexandria Ocasio-Cortez,Alexandria_Ocasio-Cortez,current
+Ron DeSantis,Ron_DeSantis,current
+Marjorie Taylor Greene,Marjorie_Taylor_Greene,current
+Charlie Kirk,Charlie_Kirk,current
+Tucker Carlson,Tucker_Carlson,current
+Ben Shapiro,Ben_Shapiro,current
+Joe Rogan,Joe_Rogan,current
+Andrew Tate,Andrew_Tate,current
+Jordan Peterson,Jordan_Peterson,current
+Robert F. Kennedy Jr.,Robert_F._Kennedy_Jr.,current
+Alex Jones,Alex_Jones,current
+Steve Bannon,Steve_Bannon,current
+Kamala Harris,Kamala_Harris,current
+Nancy Pelosi,Nancy_Pelosi,current
+Mitch McConnell,Mitch_McConnell,current
+Xi Jinping,Xi_Jinping,current
+Kim Jong Un,Kim_Jong_Un,current
+Narendra Modi,Narendra_Modi,current
+Recep Tayyip Erdoğan,Recep_Tayyip_Erdoğan,current
+Benjamin Netanyahu,Benjamin_Netanyahu,current
+Volodymyr Zelenskyy,Volodymyr_Zelenskyy,current
+Emmanuel Macron,Emmanuel_Macron,current
+Angela Merkel,Angela_Merkel,current
+Boris Johnson,Boris_Johnson,current
+Rishi Sunak,Rishi_Sunak,current
+Justin Trudeau,Justin_Trudeau,current
+Jair Bolsonaro,Jair_Bolsonaro,current
+Viktor Orbán,Viktor_Orbán,current
+Marine Le Pen,Marine_Le_Pen,current
+Nigel Farage,Nigel_Farage,current
+Mohammed bin Salman,Mohammed_bin_Salman,current
+Bashar al-Assad,Bashar_al-Assad,current
+Mahmoud Abbas,Mahmoud_Abbas,current
+Pope Francis,Pope_Francis,current
+Elon Musk,Elon_Musk,current
+Mark Zuckerberg,Mark_Zuckerberg,current
+Jeff Bezos,Jeff_Bezos,current
+Bill Gates,Bill_Gates,current
+Sam Altman,Sam_Altman,current
+Peter Thiel,Peter_Thiel,current
+Tim Cook,Tim_Cook,current
+Sundar Pichai,Sundar_Pichai,current
+Satya Nadella,Satya_Nadella,current
+Larry Page,Larry_Page,current
+Sergey Brin,Sergey_Brin,current
+Jack Dorsey,Jack_Dorsey,current
+Vitalik Buterin,Vitalik_Buterin,current
+Marc Andreessen,Marc_Andreessen,current
+Sheryl Sandberg,Sheryl_Sandberg,current
+LeBron James,LeBron_James,current
+Cristiano Ronaldo,Cristiano_Ronaldo,current
+Lionel Messi,Lionel_Messi,current
+Tom Brady,Tom_Brady,current
+Conor McGregor,Conor_McGregor,current
+Floyd Mayweather Jr.,Floyd_Mayweather_Jr.,current
+Tiger Woods,Tiger_Woods,current
+Serena Williams,Serena_Williams,current
+Stephen Curry,Stephen_Curry,current
+Kevin Durant,Kevin_Durant,current
+Aaron Rodgers,Aaron_Rodgers,current
+Mike Tyson,Mike_Tyson,current
+Lance Armstrong,Lance_Armstrong,current
+Khabib Nurmagomedov,Khabib_Nurmagomedov,current
+Naomi Osaka,Naomi_Osaka,current
+Kanye West,Kanye_West,current
+Taylor Swift,Taylor_Swift,current
+Beyoncé,Beyoncé,current
+Jay-Z,Jay-Z,current
+Drake,Drake_(musician),current
+Kim Kardashian,Kim_Kardashian,current
+Kylie Jenner,Kylie_Jenner,current
+Justin Bieber,Justin_Bieber,current
+Rihanna,Rihanna,current
+Ariana Grande,Ariana_Grande,current
+Eminem,Eminem,current
+Chris Brown,Chris_Brown,current
+Cardi B,Cardi_B,current
+Nicki Minaj,Nicki_Minaj,current
+Logan Paul,Logan_Paul,current
+Jake Paul,Jake_Paul,current
+MrBeast,MrBeast,current
+PewDiePie,PewDiePie,current
+Sean Combs,Sean_Combs,current
+R. Kelly,R._Kelly,current
+Bill Cosby,Bill_Cosby,current
+Harvey Weinstein,Harvey_Weinstein,current
+Jeffrey Epstein,Jeffrey_Epstein,current
+Ghislaine Maxwell,Ghislaine_Maxwell,current
+O. J. Simpson,O._J._Simpson,current
+Greta Thunberg,Greta_Thunberg,current
+Malala Yousafzai,Malala_Yousafzai,current
+Edward Snowden,Edward_Snowden,current
+Julian Assange,Julian_Assange,current

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase";
 import { signMatchup } from "@/lib/matchup-token";
 import { ensureSessionId } from "@/lib/session";
+import { parseCategory } from "@/lib/category";
 import type { Figure, MatchupResponse } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -9,15 +10,16 @@ export const dynamic = "force-dynamic";
 const ELO_BAND = 200;
 const A_POOL = 20;
 
-export async function GET(): Promise<NextResponse<MatchupResponse | { error: string }>> {
+export async function GET(req: Request): Promise<NextResponse<MatchupResponse | { error: string }>> {
   await ensureSessionId();
   const supabase = getServerSupabase();
+  const url = new URL(req.url);
+  const category = parseCategory(url.searchParams.get("cat"));
 
-  // Pick A from the 20 figures with the fewest matches, so every figure shows
-  // up regularly while still being a little random.
   const { data: pool, error: poolErr } = await supabase
     .from("figures")
     .select("*")
+    .eq("category", category)
     .order("matches", { ascending: true })
     .limit(A_POOL);
   if (poolErr || !pool || pool.length === 0) {
@@ -25,12 +27,10 @@ export async function GET(): Promise<NextResponse<MatchupResponse | { error: str
   }
   const a = pool[Math.floor(Math.random() * pool.length)] as Figure;
 
-  // Pick B within +/- ELO_BAND of A. Fall back to a fully random other figure
-  // if the band is empty (shouldn't happen in practice once we have a real
-  // dataset, but keeps the endpoint resilient on a tiny seed).
   const { data: nearby, error: nearbyErr } = await supabase
     .from("figures")
     .select("*")
+    .eq("category", category)
     .gte("elo", Number(a.elo) - ELO_BAND)
     .lte("elo", Number(a.elo) + ELO_BAND)
     .neq("id", a.id)
@@ -46,6 +46,7 @@ export async function GET(): Promise<NextResponse<MatchupResponse | { error: str
     const { data: anyOther } = await supabase
       .from("figures")
       .select("*")
+      .eq("category", category)
       .neq("id", a.id)
       .limit(100);
     if (anyOther && anyOther.length > 0) {

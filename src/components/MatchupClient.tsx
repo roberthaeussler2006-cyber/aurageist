@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Figure, MatchupResponse, VoteResponse } from "@/lib/types";
+import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/types";
 import { FigureBlurb, formatYears } from "./FigureBlurb";
 
 type VoteResult = {
@@ -14,7 +15,7 @@ type VoteResult = {
 
 type Status = "loading" | "ready" | "error";
 
-export function MatchupClient() {
+export function MatchupClient({ category = "historical" }: { category?: Category }) {
   const [matchup, setMatchup] = useState<MatchupResponse | null>(null);
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export function MatchupClient() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/matchup", { cache: "no-store", signal: controller.signal })
+    fetch(`/api/matchup?cat=${category}`, { cache: "no-store", signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`status ${res.status}`);
         const json = (await res.json()) as MatchupResponse;
@@ -40,7 +41,7 @@ export function MatchupClient() {
         setStatus("error");
       });
     return () => controller.abort();
-  }, [reloadKey]);
+  }, [reloadKey, category]);
 
   useEffect(() => {
     return () => {
@@ -115,10 +116,18 @@ export function MatchupClient() {
     return () => window.removeEventListener("keydown", onKey);
   }, [matchup, submitting, submitVote, skip]);
 
+  const otherCategory = category === "current" ? "historical" : "current";
+  const otherHref = category === "current" ? "/" : "/current";
+  const subtitle = category === "current" ? "Current figures" : "Historical figures";
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 pb-10 pt-2">
-      <div className="text-[10px] uppercase tracking-[0.3em] text-muted mb-6 sm:mb-8">
-        Round of judgment
+      <div className="text-[10px] uppercase tracking-[0.3em] text-muted mb-6 sm:mb-8 flex items-center gap-3">
+        <span className="text-accent">{subtitle}</span>
+        <span className="text-muted/40">·</span>
+        <Link href={otherHref} className="hover:text-accent transition-colors">
+          try {otherCategory} →
+        </Link>
       </div>
 
       <div className="w-full max-w-6xl flex-1 flex flex-col">

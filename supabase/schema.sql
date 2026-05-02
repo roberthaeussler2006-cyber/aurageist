@@ -8,11 +8,15 @@ create table if not exists figures (
   birth_year int,
   death_year int,
   short_blurb text,
+  category text not null default 'historical',
   elo numeric not null default 1500,
   matches int not null default 0,
   wins int not null default 0,
   created_at timestamptz default now()
 );
+
+-- Backfill the column on existing installs that predated it.
+alter table figures add column if not exists category text not null default 'historical';
 
 create table if not exists matches (
   id uuid primary key default gen_random_uuid(),
@@ -25,6 +29,8 @@ create table if not exists matches (
 );
 
 create index if not exists figures_elo_idx on figures (elo desc);
+create index if not exists figures_category_elo_idx on figures (category, elo desc);
+create index if not exists figures_category_matches_idx on figures (category, matches asc);
 create index if not exists matches_created_idx on matches (created_at desc);
 
 insert into storage.buckets (id, name, public)
