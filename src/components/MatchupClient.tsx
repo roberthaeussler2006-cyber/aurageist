@@ -52,6 +52,28 @@ export function MatchupClient({
   const wallet = useWallet();
   const [burst, setBurst] = useState<Burst | null>(null);
 
+  // Kirked mode: 50% of page loads, every portrait becomes Charlie Kirk and
+  // voting triggers a big spinning "YOU GOT KIRKED" overlay. Decided once
+  // per mount so it persists across consecutive matchups in the session.
+  const [kirkedMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return Math.random() < 0.5;
+  });
+  const [kirkUrl, setKirkUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!kirkedMode || kirkUrl) return;
+    let cancelled = false;
+    fetch("/api/figure/Charlie_Kirk")
+      .then((r) => r.json())
+      .then((j) => {
+        if (!cancelled && j?.figure?.image_url) setKirkUrl(j.figure.image_url);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [kirkedMode, kirkUrl]);
+
   useEffect(() => {
     // If we have a prefetched matchup ready, use it without a network round-trip.
     if (prefetched.current) {
@@ -268,6 +290,8 @@ export function MatchupClient({
                 onSkip={skip}
                 disabled={submitting}
                 voteResult={voteResult}
+                kirkedMode={kirkedMode}
+                kirkUrl={kirkUrl}
               />
             </motion.div>
           ) : null}
@@ -275,6 +299,7 @@ export function MatchupClient({
       </div>
 
       <CoinBurst burst={burst} onDone={() => setBurst(null)} />
+      <KirkedOverlay show={kirkedMode && voteResult !== null} kirkUrl={kirkUrl} />
 
       <div className="mt-8 text-[10px] uppercase tracking-[0.25em] font-bold text-foreground/40 hidden sm:flex items-center gap-3">
         <kbd className="px-2 py-1 rounded-md bg-white/60 border border-white/70 backdrop-blur text-[9px]">←</kbd> pick left
@@ -294,6 +319,8 @@ function PairLayout({
   onSkip,
   disabled,
   voteResult,
+  kirkedMode,
+  kirkUrl,
 }: {
   a: Figure;
   b: Figure;
@@ -301,6 +328,8 @@ function PairLayout({
   onSkip: () => void;
   disabled: boolean;
   voteResult: VoteResult | null;
+  kirkedMode: boolean;
+  kirkUrl: string | null;
 }) {
   return (
     <div className="relative">
@@ -320,6 +349,8 @@ function PairLayout({
             won={voteResult?.winnerId === a.id}
             lost={voteResult?.loserId === a.id}
             side="left"
+            kirkedMode={kirkedMode}
+            kirkUrl={kirkUrl}
           />
           <div className="hidden md:block">
             <Comments figureId={a.id} compact />
@@ -356,6 +387,8 @@ function PairLayout({
             won={voteResult?.winnerId === b.id}
             lost={voteResult?.loserId === b.id}
             side="right"
+            kirkedMode={kirkedMode}
+            kirkUrl={kirkUrl}
           />
           <div className="hidden md:block">
             <Comments figureId={b.id} compact />
@@ -403,6 +436,8 @@ function FigureChoice({
   won,
   lost,
   side,
+  kirkedMode,
+  kirkUrl,
 }: {
   figure: Figure;
   onClick: () => void;
@@ -411,6 +446,8 @@ function FigureChoice({
   won: boolean;
   lost: boolean;
   side: "left" | "right";
+  kirkedMode: boolean;
+  kirkUrl: string | null;
 }) {
   const wonStyle = won
     ? { borderColor: "var(--accent)", boxShadow: "0 0 0 6px var(--accent-soft), 0 60px 140px -30px var(--accent-glow), 0 1px 0 rgba(255,255,255,0.6) inset" }
@@ -425,16 +462,18 @@ function FigureChoice({
     setShowControversy(false);
   }, [figure.id]);
 
-  const mainSrc =
+  const baseMain =
     showControversy && controversy.available ? controversy.url : figure.image_url;
+  const mainSrc = kirkedMode && kirkUrl ? kirkUrl : baseMain;
   const peekSrc =
     showControversy && controversy.available ? figure.image_url : controversy.url;
+  const displayName = kirkedMode ? "Charlie Kirk" : figure.name;
 
   return (
     <div className="relative">
       <button
         type="button"
-        aria-label={`Vote ${figure.name} as having more aura`}
+        aria-label={`Vote ${displayName} as having more aura`}
         onClick={onClick}
         disabled={disabled}
         className={`glass-card group relative text-left overflow-hidden w-full ${
@@ -447,7 +486,7 @@ function FigureChoice({
             <Image
               key={mainSrc}
               src={mainSrc}
-              alt={figure.name}
+              alt={displayName}
               fill
               priority
               fetchPriority="high"
@@ -492,7 +531,7 @@ function FigureChoice({
 
         <div className="px-3 py-3 sm:px-7 sm:py-6">
           <h2 className="display-italic text-lg sm:text-4xl leading-tight text-foreground line-clamp-2 sm:line-clamp-none">
-            {figure.name}
+            {displayName}
           </h2>
           <div className="text-[9px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.16em] font-bold text-muted mt-1 sm:mt-1.5 truncate">
             {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
@@ -776,5 +815,49 @@ function CoinIcon() {
         A
       </text>
     </svg>
+  );
+}
+
+function KirkedOverlay({ show, kirkUrl }: { show: boolean; kirkUrl: string | null }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          key="kirked"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[120] grid place-items-center bg-black/85 backdrop-blur-sm pointer-events-none"
+        >
+          {kirkUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={kirkUrl}
+              alt=""
+              className="absolute inset-0 m-auto h-[60vmin] w-[60vmin] object-cover rounded-full opacity-30 blur-sm"
+              draggable={false}
+            />
+          )}
+          <motion.div
+            initial={{ scale: 0.3, rotate: -540 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 80, damping: 12 }}
+            className="relative text-white font-extrabold uppercase text-center leading-none drop-shadow-[0_8px_30px_rgba(255,255,255,0.4)]"
+            style={{ fontSize: "clamp(3rem, 18vw, 16rem)" }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 2.4, ease: "linear" }}
+              style={{ display: "inline-block" }}
+            >
+              You got
+              <br />
+              KIRKED
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
