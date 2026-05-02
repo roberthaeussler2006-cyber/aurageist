@@ -14,8 +14,15 @@ type Comment = {
 };
 
 const MAX_LEN = 1000;
+const COMPACT_LIMIT = 5;
 
-export function Comments({ figureId }: { figureId: string }) {
+export function Comments({
+  figureId,
+  compact = false,
+}: {
+  figureId: string;
+  compact?: boolean;
+}) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [body, setBody] = useState("");
@@ -72,19 +79,22 @@ export function Comments({ figureId }: { figureId: string }) {
     setComments((prev) => (prev ? prev.filter((c) => c.id !== id) : prev));
   };
 
+  const visible = compact && comments ? comments.slice(0, COMPACT_LIMIT) : comments;
+  const hiddenCount = compact && comments ? Math.max(0, comments.length - COMPACT_LIMIT) : 0;
+
   return (
-    <section className="mt-10 sm:mt-14">
-      <h2 className="text-[10px] uppercase tracking-[0.3em] text-muted mb-4">
+    <section className={compact ? "mt-4" : "mt-10 sm:mt-14"}>
+      <h2 className={`text-[10px] uppercase tracking-[0.3em] text-muted ${compact ? "mb-2" : "mb-4"}`}>
         Comments {comments ? `(${comments.length})` : ""}
       </h2>
 
       {user ? (
-        <form onSubmit={submit} className="border border-line bg-panel/30 p-3 mb-6">
+        <form onSubmit={submit} className={`border border-line bg-panel/30 ${compact ? "p-2 mb-3" : "p-3 mb-6"}`}>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
             placeholder="Share your take…"
-            rows={3}
+            rows={compact ? 2 : 3}
             className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none resize-none"
           />
           <div className="flex items-center justify-between mt-2">
@@ -116,8 +126,8 @@ export function Comments({ figureId }: { figureId: string }) {
       ) : comments.length === 0 ? (
         <p className="text-foreground/60 text-sm">No comments yet. Be the first.</p>
       ) : (
-        <ul className="space-y-3">
-          {comments.map((c) => (
+        <ul className={compact ? "space-y-2" : "space-y-3"}>
+          {visible!.map((c) => (
             <li key={c.id} className="border border-line bg-panel/30 px-3 py-3">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-muted/80">
                 <span className="text-accent/80">{c.author_name}</span>
@@ -139,6 +149,11 @@ export function Comments({ figureId }: { figureId: string }) {
               </p>
             </li>
           ))}
+          {hiddenCount > 0 && (
+            <li className="text-[10px] uppercase tracking-[0.2em] text-muted/70 pt-1">
+              + {hiddenCount} more on figure page
+            </li>
+          )}
         </ul>
       )}
     </section>
