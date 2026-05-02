@@ -20,7 +20,13 @@ type VoteResult = {
 
 type Status = "loading" | "ready" | "error";
 
-export function MatchupClient({ category = "historical" }: { category?: Category }) {
+export function MatchupClient({
+  category = "historical",
+  theme,
+}: {
+  category?: Category;
+  theme?: string;
+}) {
   const [matchup, setMatchup] = useState<MatchupResponse | null>(null);
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +38,8 @@ export function MatchupClient({ category = "historical" }: { category?: Category
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`/api/matchup?cat=${category}`, { cache: "no-store", signal: controller.signal })
+    const qs = theme ? `theme=${encodeURIComponent(theme)}` : `cat=${category}`;
+    fetch(`/api/matchup?${qs}`, { cache: "no-store", signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`status ${res.status}`);
         const json = (await res.json()) as MatchupResponse;

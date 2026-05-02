@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const DISMISS_KEY = "brainrot-dismissed";
-const SRC = "/brainrot.mp4";
+// Swap this for whatever YouTube video ID you want looping.
+const YT_ID = "Vp6-J8qQ3Ng";
 
 export function BrainrotPanel() {
   const [visible, setVisible] = useState(false);
-  const [available, setAvailable] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -16,19 +15,18 @@ export function BrainrotPanel() {
     setVisible(true);
   }, []);
 
-  if (!visible || !available) return null;
+  if (!visible) return null;
+
+  const src = `https://www.youtube-nocookie.com/embed/${YT_ID}?autoplay=1&mute=1&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&playsinline=1&rel=0`;
 
   return (
     <div className="fixed bottom-3 right-3 z-50 w-[120px] sm:w-[140px] aspect-[9/16] rounded-xl overflow-hidden shadow-2xl ring-1 ring-black/20 bg-black group">
-      <video
-        ref={videoRef}
-        src={SRC}
-        autoPlay
-        loop
-        muted
-        playsInline
-        onError={() => setAvailable(false)}
-        className="w-full h-full object-cover"
+      <iframe
+        src={src}
+        title="brainrot"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen={false}
+        className="w-full h-full pointer-events-none"
       />
       <button
         type="button"
