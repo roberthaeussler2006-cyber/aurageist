@@ -24,6 +24,9 @@ export type Figure = {
   created_at: string;
   social_url: string | null;
   social_kind: SocialKind | "none" | null;
+  fame_rank: number | null;
+  controversy_rank: number | null;
+  money_rank: number | null;
 };
 
 export type MatchRecord = {

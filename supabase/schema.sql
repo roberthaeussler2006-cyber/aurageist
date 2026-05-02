@@ -21,6 +21,11 @@ create table if not exists figures (
 alter table figures add column if not exists category text not null default 'historical';
 alter table figures add column if not exists social_url text;
 alter table figures add column if not exists social_kind text;
+-- Editorial ranks (1-100) for current figures only. Seeded by hand in
+-- scripts/seed-ranks.ts; null means "not yet rated".
+alter table figures add column if not exists fame_rank int;
+alter table figures add column if not exists controversy_rank int;
+alter table figures add column if not exists money_rank int;
 
 create table if not exists matches (
   id uuid primary key default gen_random_uuid(),

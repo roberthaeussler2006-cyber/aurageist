@@ -89,6 +89,14 @@ export default async function FigurePage({
               <Stat label="Losses" value={losses.toString()} />
               <Stat label="Win rate" value={`${winRate}%`} />
             </div>
+
+            {figure.category === "current" && (
+              <RankPanel
+                fame={figure.fame_rank}
+                controversy={figure.controversy_rank}
+                money={figure.money_rank}
+              />
+            )}
           </div>
         </div>
 
@@ -138,6 +146,68 @@ export default async function FigurePage({
             Vote in a new matchup
           </Link>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function RankPanel({
+  fame,
+  controversy,
+  money,
+}: {
+  fame: number | null;
+  controversy: number | null;
+  money: number | null;
+}) {
+  const items: { label: string; value: number | null; tone: string }[] = [
+    { label: "Famous", value: fame, tone: "from-fuchsia-500 to-rose-500" },
+    { label: "Controversial", value: controversy, tone: "from-amber-500 to-red-600" },
+    { label: "Money", value: money, tone: "from-emerald-500 to-teal-600" },
+  ];
+  const anyRated = items.some((i) => i.value != null);
+  return (
+    <div className="mt-6 rounded-2xl border border-line bg-panel px-4 sm:px-5 py-4 sm:py-5 shadow-sm">
+      <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted mb-3">
+        Editorial ranks
+      </div>
+      {anyRated ? (
+        <div className="space-y-3">
+          {items.map((i) => (
+            <RankBar key={i.label} label={i.label} value={i.value} tone={i.tone} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-muted">Not yet rated.</p>
+      )}
+    </div>
+  );
+}
+
+function RankBar({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number | null;
+  tone: string;
+}) {
+  const pct = value == null ? 0 : Math.max(0, Math.min(100, value));
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-1.5">
+        <span className="text-xs sm:text-sm font-semibold text-foreground/80">{label}</span>
+        <span className="text-sm font-bold tabular-nums text-foreground/90">
+          {value == null ? "—" : `${value}`}
+          <span className="text-[10px] uppercase tracking-[0.18em] text-muted ml-1">/ 100</span>
+        </span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-line/60 overflow-hidden">
+        <div
+          className={`h-full bg-gradient-to-r ${tone} rounded-full transition-all`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
