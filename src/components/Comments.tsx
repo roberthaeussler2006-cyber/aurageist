@@ -46,8 +46,10 @@ export function Comments({
       .limit(200);
     if (error) {
       setError(error.message);
+      setComments([]);
       return;
     }
+    setError(null);
     setComments((data as Comment[]) ?? []);
   }, [figureId]);
 
@@ -101,19 +103,22 @@ export function Comments({
   const hiddenCount = compact && comments ? Math.max(0, comments.length - COMPACT_LIMIT) : 0;
 
   return (
-    <section className={compact ? "mt-4" : "mt-10 sm:mt-14"}>
-      <h2 className={`text-[10px] uppercase tracking-[0.3em] text-muted ${compact ? "mb-2" : "mb-4"}`}>
-        Comments {comments ? `(${comments.length})` : ""}
+    <section className={compact ? "mt-5" : "mt-10 sm:mt-14"}>
+      <h2 className={`text-[11px] uppercase tracking-[0.18em] font-semibold text-muted ${compact ? "mb-2" : "mb-4"}`}>
+        Comments {comments && comments.length > 0 ? `· ${comments.length}` : ""}
       </h2>
 
-      <form onSubmit={submit} className={`border border-line bg-panel/30 ${compact ? "p-2 mb-3" : "p-3 mb-6"}`}>
+      <form
+        onSubmit={submit}
+        className={`rounded-2xl bg-panel border border-line shadow-sm ${compact ? "p-3 mb-3" : "p-4 mb-5"}`}
+      >
         {!user && (
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value.slice(0, MAX_NAME_LEN))}
             placeholder="Your name (optional)"
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none border-b border-line/50 pb-1 mb-2"
+            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none border-b border-line pb-2 mb-2"
           />
         )}
         <textarea
@@ -121,40 +126,46 @@ export function Comments({
           onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
           placeholder="Share your take…"
           rows={compact ? 2 : 3}
-          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none resize-none"
+          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none resize-none"
         />
         <div className="flex items-center justify-between mt-2">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted/70">
+          <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
             {body.length}/{MAX_LEN}
           </span>
           <button
             type="submit"
             disabled={submitting || !body.trim()}
-            className="px-4 py-2 border border-accent/60 text-accent uppercase tracking-[0.25em] text-[10px] hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="btn-gradient px-5 py-2 text-[11px] uppercase disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? "Posting…" : "Post"}
           </button>
         </div>
       </form>
 
-      {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+      {error && (
+        <div className="rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs px-3 py-2 mb-3">
+          {error.toLowerCase().includes("schema cache") || error.toLowerCase().includes("comments")
+            ? "Comments table isn't set up yet — run supabase/schema.sql in the Supabase SQL editor."
+            : error}
+        </div>
+      )}
 
       {comments === null ? (
-        <p className="text-foreground/60 text-sm">Loading…</p>
+        <p className="text-muted text-sm">Loading…</p>
       ) : comments.length === 0 ? (
-        <p className="text-foreground/60 text-sm">No comments yet. Be the first.</p>
+        !error && <p className="text-muted text-sm">No comments yet. Be the first.</p>
       ) : (
         <ul className={compact ? "space-y-2" : "space-y-3"}>
           {visible!.map((c) => (
-            <li key={c.id} className="border border-line bg-panel/30 px-3 py-3">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-muted/80">
-                <span className="text-accent/80">{c.author_name}</span>
+            <li key={c.id} className="rounded-2xl bg-panel border border-line px-4 py-3 shadow-sm">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
+                <span className="text-gradient">{c.author_name}</span>
                 <span className="flex items-center gap-3">
                   <span>{new Date(c.created_at).toLocaleDateString()}</span>
                   {user && c.user_id && user.id === c.user_id && (
                     <button
                       onClick={() => remove(c.id)}
-                      className="hover:text-red-400 transition-colors"
+                      className="hover:text-rose-600 transition-colors"
                       aria-label="Delete comment"
                     >
                       delete
@@ -162,13 +173,13 @@ export function Comments({
                   )}
                 </span>
               </div>
-              <p className="text-sm text-foreground/90 mt-2 whitespace-pre-wrap break-words">
+              <p className="text-sm text-foreground mt-2 whitespace-pre-wrap break-words">
                 {c.body}
               </p>
             </li>
           ))}
           {hiddenCount > 0 && (
-            <li className="text-[10px] uppercase tracking-[0.2em] text-muted/70 pt-1">
+            <li className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted pt-1">
               + {hiddenCount} more on figure page
             </li>
           )}
