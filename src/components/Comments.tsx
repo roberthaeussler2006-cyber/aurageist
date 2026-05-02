@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 type Comment = {
   id: string;
   user_id: string | null;
+  parent_id: string | null;
   author_name: string;
   body: string;
   created_at: string;
@@ -26,9 +27,7 @@ export function Comments({
 }) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[] | null>(null);
-  const [body, setBody] = useState("");
   const [name, setName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,10 +39,10 @@ export function Comments({
   const load = useCallback(async () => {
     const { data, error } = await getBrowserSupabase()
       .from("comments")
-      .select("id,user_id,author_name,body,created_at")
+      .select("id,user_id,parent_id,author_name,body,created_at")
       .eq("figure_id", figureId)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(400);
     if (error) {
       setError(error.message);
       setComments([]);
@@ -57,10 +56,9 @@ export function Comments({
     void load();
   }, [load]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    const trimmed = body.trim();
-    if (!trimmed) return;
+  const post = async (text: string, parentId: string | null): Promise<string | null> => {
+    const trimmed = text.trim();
+    if (!trimmed) return "Empty comment";
 
     let author_name: string;
     if (user) {
@@ -73,21 +71,16 @@ export function Comments({
       }
     }
 
-    setSubmitting(true);
-    setError(null);
     const { error } = await getBrowserSupabase().from("comments").insert({
       figure_id: figureId,
       user_id: user?.id ?? null,
+      parent_id: parentId,
       author_name,
       body: trimmed.slice(0, MAX_LEN),
     });
-    setSubmitting(false);
-    if (error) {
-      setError(error.message);
-      return;
-    }
-    setBody("");
+    if (error) return error.message;
     void load();
+    return null;
   };
 
   const remove = async (id: string) => {
@@ -96,11 +89,23 @@ export function Comments({
       setError(error.message);
       return;
     }
-    setComments((prev) => (prev ? prev.filter((c) => c.id !== id) : prev));
+    setComments((prev) => (prev ? prev.filter((c) => c.id !== id && c.parent_id !== id) : prev));
   };
 
-  const visible = compact && comments ? comments.slice(0, COMPACT_LIMIT) : comments;
-  const hiddenCount = compact && comments ? Math.max(0, comments.length - COMPACT_LIMIT) : 0;
+  const roots = (comments ?? []).filter((c) => !c.parent_id);
+  const repliesByParent = new Map<string, Comment[]>();
+  for (const c of comments ?? []) {
+    if (!c.parent_id) continue;
+    const arr = repliesByParent.get(c.parent_id) ?? [];
+    arr.push(c);
+    repliesByParent.set(c.parent_id, arr);
+  }
+  for (const arr of repliesByParent.values()) {
+    arr.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+
+  const visibleRoots = compact ? roots.slice(0, COMPACT_LIMIT) : roots;
+  const hiddenCount = compact ? Math.max(0, roots.length - COMPACT_LIMIT) : 0;
 
   return (
     <section className={compact ? "mt-5" : "mt-10 sm:mt-14"}>
@@ -108,39 +113,15 @@ export function Comments({
         Comments {comments && comments.length > 0 ? `· ${comments.length}` : ""}
       </h2>
 
-      <form
-        onSubmit={submit}
-        className={`rounded-2xl bg-panel border border-line shadow-sm ${compact ? "p-3 mb-3" : "p-4 mb-5"}`}
-      >
-        {!user && (
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value.slice(0, MAX_NAME_LEN))}
-            placeholder="Your name (optional)"
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none border-b border-line pb-2 mb-2"
-          />
-        )}
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
-          placeholder="Share your take…"
-          rows={compact ? 2 : 3}
-          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none resize-none"
-        />
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
-            {body.length}/{MAX_LEN}
-          </span>
-          <button
-            type="submit"
-            disabled={submitting || !body.trim()}
-            className="btn-gradient px-5 py-2 text-[11px] uppercase disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {submitting ? "Posting…" : "Post"}
-          </button>
-        </div>
-      </form>
+      <CommentForm
+        compact={compact}
+        showName={!user}
+        name={name}
+        setName={setName}
+        onSubmit={(text) => post(text, null)}
+        placeholder="Share your take…"
+        submitLabel="Post"
+      />
 
       {error && (
         <div className="rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs px-3 py-2 mb-3">
@@ -152,31 +133,22 @@ export function Comments({
 
       {comments === null ? (
         <p className="text-muted text-sm">Loading…</p>
-      ) : comments.length === 0 ? (
+      ) : roots.length === 0 ? (
         !error && <p className="text-muted text-sm">No comments yet. Be the first.</p>
       ) : (
         <ul className={compact ? "space-y-2" : "space-y-3"}>
-          {visible!.map((c) => (
-            <li key={c.id} className="rounded-2xl bg-panel border border-line px-4 py-3 shadow-sm">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
-                <span className="text-gradient">{c.author_name}</span>
-                <span className="flex items-center gap-3">
-                  <span>{new Date(c.created_at).toLocaleDateString()}</span>
-                  {user && c.user_id && user.id === c.user_id && (
-                    <button
-                      onClick={() => remove(c.id)}
-                      className="hover:text-rose-600 transition-colors"
-                      aria-label="Delete comment"
-                    >
-                      delete
-                    </button>
-                  )}
-                </span>
-              </div>
-              <p className="text-sm text-foreground mt-2 whitespace-pre-wrap break-words">
-                {c.body}
-              </p>
-            </li>
+          {visibleRoots.map((c) => (
+            <CommentItem
+              key={c.id}
+              comment={c}
+              replies={repliesByParent.get(c.id) ?? []}
+              onReply={(text) => post(text, c.id)}
+              onDelete={remove}
+              currentUserId={user?.id ?? null}
+              showNameField={!user}
+              name={name}
+              setName={setName}
+            />
           ))}
           {hiddenCount > 0 && (
             <li className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted pt-1">
@@ -186,5 +158,187 @@ export function Comments({
         </ul>
       )}
     </section>
+  );
+}
+
+function CommentItem({
+  comment,
+  replies,
+  onReply,
+  onDelete,
+  currentUserId,
+  showNameField,
+  name,
+  setName,
+}: {
+  comment: Comment;
+  replies: Comment[];
+  onReply: (text: string) => Promise<string | null>;
+  onDelete: (id: string) => void;
+  currentUserId: string | null;
+  showNameField: boolean;
+  name: string;
+  setName: (n: string) => void;
+}) {
+  const [replyOpen, setReplyOpen] = useState(false);
+  const isOwn = currentUserId !== null && comment.user_id === currentUserId;
+
+  return (
+    <li className="rounded-2xl bg-panel border border-line px-4 py-3 shadow-sm">
+      <CommentBody comment={comment} isOwn={isOwn} onDelete={onDelete} />
+      <div className="flex items-center gap-3 mt-2">
+        <button
+          type="button"
+          onClick={() => setReplyOpen((v) => !v)}
+          className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent transition-colors"
+        >
+          {replyOpen ? "cancel" : "reply"}
+        </button>
+        {replies.length > 0 && (
+          <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
+            · {replies.length} {replies.length === 1 ? "reply" : "replies"}
+          </span>
+        )}
+      </div>
+
+      {replyOpen && (
+        <div className="mt-3">
+          <CommentForm
+            compact
+            showName={showNameField}
+            name={name}
+            setName={setName}
+            onSubmit={async (text) => {
+              const err = await onReply(text);
+              if (!err) setReplyOpen(false);
+              return err;
+            }}
+            placeholder={`Reply to ${comment.author_name}…`}
+            submitLabel="Reply"
+          />
+        </div>
+      )}
+
+      {replies.length > 0 && (
+        <ul className="mt-3 pl-4 border-l-2 border-line space-y-2">
+          {replies.map((r) => {
+            const replyOwn = currentUserId !== null && r.user_id === currentUserId;
+            return (
+              <li key={r.id} className="rounded-xl bg-white/60 border border-line/60 px-3 py-2">
+                <CommentBody comment={r} isOwn={replyOwn} onDelete={onDelete} />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+function CommentBody({
+  comment,
+  isOwn,
+  onDelete,
+}: {
+  comment: Comment;
+  isOwn: boolean;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <>
+      <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
+        <span className="text-gradient">{comment.author_name}</span>
+        <span className="flex items-center gap-3">
+          <span>{new Date(comment.created_at).toLocaleDateString()}</span>
+          {isOwn && (
+            <button
+              onClick={() => onDelete(comment.id)}
+              className="hover:text-rose-600 transition-colors"
+              aria-label="Delete comment"
+            >
+              delete
+            </button>
+          )}
+        </span>
+      </div>
+      <p className="text-sm text-foreground mt-2 whitespace-pre-wrap break-words">
+        {comment.body}
+      </p>
+    </>
+  );
+}
+
+function CommentForm({
+  compact,
+  showName,
+  name,
+  setName,
+  onSubmit,
+  placeholder,
+  submitLabel,
+}: {
+  compact: boolean;
+  showName: boolean;
+  name: string;
+  setName: (n: string) => void;
+  onSubmit: (text: string) => Promise<string | null>;
+  placeholder: string;
+  submitLabel: string;
+}) {
+  const [body, setBody] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const handle = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!body.trim()) return;
+    setSubmitting(true);
+    setLocalError(null);
+    const err = await onSubmit(body);
+    setSubmitting(false);
+    if (err) {
+      setLocalError(err);
+      return;
+    }
+    setBody("");
+  };
+
+  return (
+    <form
+      onSubmit={handle}
+      className={`rounded-2xl bg-panel border border-line shadow-sm ${compact ? "p-3 mb-3" : "p-4 mb-5"}`}
+    >
+      {showName && (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value.slice(0, MAX_NAME_LEN))}
+          placeholder="Your name (optional)"
+          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none border-b border-line pb-2 mb-2"
+        />
+      )}
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
+        placeholder={placeholder}
+        rows={compact ? 2 : 3}
+        className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none resize-none"
+      />
+      <div className="flex items-center justify-between mt-2">
+        <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">
+          {body.length}/{MAX_LEN}
+        </span>
+        <button
+          type="submit"
+          disabled={submitting || !body.trim()}
+          className="btn-gradient px-5 py-2 text-[11px] uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {submitting ? "…" : submitLabel}
+        </button>
+      </div>
+      {localError && (
+        <p className="text-[11px] text-rose-600 mt-2">{localError}</p>
+      )}
+    </form>
   );
 }
