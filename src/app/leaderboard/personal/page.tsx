@@ -63,9 +63,9 @@ export default function PersonalLeaderboardPage() {
     return (
       <div className="flex-1 flex items-center justify-center px-6 text-center">
         <div>
-          <p className="serif text-2xl italic mb-3">sign in to see your personal aura ranking</p>
-          <Link href="/auth" className="text-accent uppercase text-xs tracking-[0.25em]">
-            sign in →
+          <p className="text-2xl font-semibold mb-4">Sign in to see your personal aura ranking.</p>
+          <Link href="/auth" className="btn-gradient inline-block px-6 py-3 text-xs uppercase">
+            Sign in →
           </Link>
         </div>
       </div>
@@ -76,20 +76,26 @@ export default function PersonalLeaderboardPage() {
     <div className="px-4 sm:px-8 pb-16 pt-2">
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-10">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-muted">Your taste</div>
-          <h1 className="serif text-4xl sm:text-5xl mt-2 italic">Personal Ranking</h1>
+          <span className="pill">Your taste</span>
+          <h1 className="text-4xl sm:text-5xl mt-3 font-bold tracking-tight">
+            <span className="text-gradient">Personal</span> Ranking
+          </h1>
           {user && (
-            <div className="mt-2 text-[10px] uppercase tracking-[0.25em] text-muted">
+            <div className="mt-2 text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">
               {(user.user_metadata?.username as string | undefined) ?? user.email}
             </div>
           )}
-          <div className="mt-4 inline-flex border border-line text-[10px] uppercase tracking-[0.25em]">
+          <div className="mt-5 inline-flex gap-2">
             {(["historical", "current"] as Category[]).map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setCategory(c)}
-                className={`px-3 py-1.5 ${category === c ? "bg-accent/15 text-accent" : "text-muted hover:text-foreground"}`}
+                className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.18em] font-semibold transition-all ${
+                  category === c
+                    ? "bg-gradient text-white shadow-lg"
+                    : "bg-panel border border-line text-muted hover:text-foreground hover:border-accent/40"
+                }`}
               >
                 {c}
               </button>
@@ -97,46 +103,56 @@ export default function PersonalLeaderboardPage() {
           </div>
         </header>
 
-        {error && <p className="text-center text-red-400">{error}</p>}
+        {error && <p className="text-center text-[#e11d48]">{error}</p>}
         {!rows && !error && <p className="text-center text-muted">loading...</p>}
         {rows && rows.length === 0 && (
           <p className="text-center text-muted">vote on some matchups to build your ranking</p>
         )}
         {rows && rows.length > 0 && (
-          <ol className="flex flex-col">
-            {rows.map((r, i) => (
-              <li
-                key={r.figure.id}
-                className="flex items-center gap-4 py-3 border-b border-line/60"
-              >
-                <span className="serif text-2xl italic text-muted w-8 text-right">{i + 1}</span>
-                {r.figure.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={r.figure.image_url}
-                    alt={r.figure.name}
-                    className="h-12 w-12 object-cover rounded-[2px] border border-line"
-                  />
-                ) : (
-                  <div className="h-12 w-12 bg-panel/60 border border-line" />
-                )}
-                <div className="flex-1 min-w-0">
+          <ol>
+            {rows.map((r, i) => {
+              const podium = i < 3;
+              return (
+                <li key={r.figure.id}>
                   <Link
                     href={`/figure/${r.figure.wiki_slug}`}
-                    className="serif text-lg hover:text-accent transition-colors truncate block"
+                    className="flex items-center gap-3 sm:gap-5 px-3 sm:px-5 py-3 sm:py-4 mb-2 rounded-2xl bg-panel border border-line hover:border-accent/40 hover:shadow-md transition-all group"
                   >
-                    {r.figure.name}
+                    <span
+                      className={`text-2xl sm:text-3xl tabular-nums w-10 sm:w-14 text-right ${
+                        podium ? "text-gradient font-bold" : "text-muted font-semibold"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    {r.figure.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={r.figure.image_url}
+                        alt={r.figure.name}
+                        className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover ring-2 ring-line group-hover:ring-accent/40 transition-all shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-line shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-base sm:text-lg truncate group-hover:text-accent transition-colors">
+                        {r.figure.name}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-[0.16em] text-muted">
+                        {r.matches} {r.matches === 1 ? "vote" : "votes"} · {r.wins}W / {r.matches - r.wins}L
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className={`text-xl sm:text-2xl font-bold tabular-nums ${podium ? "text-gradient" : "text-foreground"}`}>
+                        {Math.round(r.elo)}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-[0.16em] text-muted">aura</div>
+                    </div>
                   </Link>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
-                    {r.matches} {r.matches === 1 ? "vote" : "votes"} · {r.wins}W / {r.matches - r.wins}L
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="serif text-xl">{Math.round(r.elo)}</div>
-                  <div className="text-[9px] uppercase tracking-[0.2em] text-muted">aura</div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ol>
         )}
       </div>

@@ -12,6 +12,8 @@ create table if not exists figures (
   elo numeric not null default 1500,
   matches int not null default 0,
   wins int not null default 0,
+  social_url text,
+  social_kind text,
   created_at timestamptz default now()
 );
 

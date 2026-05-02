@@ -17,11 +17,13 @@ export function SocialLink({
   kind,
   name,
   variant = "overlay",
+  corner = "top-right",
 }: {
   url: string | null;
   kind: Kind;
   name: string;
   variant?: "overlay" | "inline";
+  corner?: "top-right" | "top-left";
 }) {
   if (!url || !kind || kind === "none") return null;
 
@@ -36,10 +38,11 @@ export function SocialLink({
   };
 
   if (variant === "overlay") {
+    const cornerClass = corner === "top-left" ? "top-3 left-3" : "top-3 right-3";
     return (
       <a
         {...baseProps}
-        className="absolute top-3 right-3 z-30 h-9 w-9 rounded-full bg-white/95 backdrop-blur ring-1 ring-line shadow-md flex items-center justify-center text-foreground hover:bg-white hover:scale-110 active:scale-95 transition-all"
+        className={`absolute ${cornerClass} z-30 h-9 w-9 rounded-full bg-white/95 backdrop-blur ring-1 ring-line shadow-md flex items-center justify-center text-foreground hover:bg-white hover:scale-110 active:scale-95 transition-all`}
       >
         <SocialIcon kind={kind} />
       </a>

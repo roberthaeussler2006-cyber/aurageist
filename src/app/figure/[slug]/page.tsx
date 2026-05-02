@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import type { FigureDetailResponse } from "@/lib/types";
 import { formatYears } from "@/components/FigureBlurb";
+import { SocialLink } from "@/components/SocialLink";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,16 @@ export default async function FigurePage({
             <div className="text-xs uppercase tracking-[0.18em] font-semibold text-muted mt-2">
               {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
             </div>
+            {figure.social_url && figure.social_kind && figure.social_kind !== "none" && (
+              <div className="mt-4">
+                <SocialLink
+                  url={figure.social_url}
+                  kind={figure.social_kind}
+                  name={figure.name}
+                  variant="inline"
+                />
+              </div>
+            )}
             {figure.short_blurb && (
               <p className="text-foreground/80 mt-4 leading-relaxed text-sm sm:text-base">
                 {figure.short_blurb}

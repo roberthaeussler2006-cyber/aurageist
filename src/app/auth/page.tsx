@@ -20,9 +20,11 @@ export default function AuthPage() {
     return (
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="text-center">
-          <p className="serif text-2xl mb-4">signed in as {display}</p>
-          <Link href="/" className="text-accent uppercase text-xs tracking-[0.25em]">
-            ← back to voting
+          <p className="text-2xl font-semibold mb-5">
+            Signed in as <span className="text-gradient">{display}</span>
+          </p>
+          <Link href="/" className="btn-gradient inline-block px-6 py-3 text-xs uppercase">
+            ← Back to voting
           </Link>
         </div>
       </div>
@@ -63,27 +65,29 @@ export default function AuthPage() {
 
   return (
     <div className="flex-1 flex items-center justify-center px-6 py-10">
-      <div className="w-full max-w-sm">
-        <h1 className="serif text-4xl italic text-center mb-1">
-          {mode === "signin" ? "sign in" : "create account"}
+      <div className="w-full max-w-sm bg-panel rounded-3xl p-8 shadow-[var(--shadow-lg)] border border-line">
+        <h1 className="text-3xl font-bold text-center tracking-tight">
+          {mode === "signin" ? "Welcome back" : (
+            <>Get your <span className="text-gradient">aura</span></>
+          )}
         </h1>
-        <p className="text-center text-[10px] uppercase tracking-[0.3em] text-muted mb-8">
-          track your personal aura ranking
+        <p className="text-center text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mt-2 mb-7">
+          {mode === "signin" ? "sign in to vote" : "track your personal ranking"}
         </p>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted">username</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">Username</span>
             <input
               type="text"
               required
               autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="bg-panel/40 border border-line px-3 py-2 text-foreground focus:border-accent/60 focus:outline-none"
+              className="bg-background border border-line rounded-xl px-4 py-3 text-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15 transition-all"
             />
           </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted">password</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">Password</span>
             <input
               type="password"
               required
@@ -91,16 +95,16 @@ export default function AuthPage() {
               autoComplete={mode === "signin" ? "current-password" : "new-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-panel/40 border border-line px-3 py-2 text-foreground focus:border-accent/60 focus:outline-none"
+              className="bg-background border border-line rounded-xl px-4 py-3 text-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15 transition-all"
             />
           </label>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-[#e11d48]">{error}</p>}
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 px-4 py-2 border border-accent/60 text-accent uppercase tracking-[0.25em] text-xs hover:bg-accent/10 disabled:opacity-40"
+            className="btn-gradient mt-2 px-4 py-3 text-xs uppercase disabled:opacity-50"
           >
-            {submitting ? "..." : mode === "signin" ? "sign in" : "sign up"}
+            {submitting ? "..." : mode === "signin" ? "Sign in" : "Sign up"}
           </button>
         </form>
         <button
@@ -109,7 +113,7 @@ export default function AuthPage() {
             setMode(mode === "signin" ? "signup" : "signin");
             setError(null);
           }}
-          className="mt-6 w-full text-center text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent"
+          className="mt-6 w-full text-center text-[11px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent transition-colors"
         >
           {mode === "signin" ? "need an account? sign up" : "have an account? sign in"}
         </button>

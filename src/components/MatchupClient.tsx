@@ -320,7 +320,12 @@ function FigureChoice({
         </AnimatePresence>
       </button>
 
-      <SocialLink url={figure.social_url} kind={figure.social_kind} name={figure.name} />
+      <SocialLink
+        url={figure.social_url}
+        kind={figure.social_kind}
+        name={figure.name}
+        corner={side === "left" ? "top-right" : "top-left"}
+      />
     </div>
   );
 }
