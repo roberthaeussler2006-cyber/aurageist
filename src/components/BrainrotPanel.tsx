@@ -1,6 +1,6 @@
 "use client";
 
-const YT_ID = "9q6eL3iSATM";
+const YT_ID = "5dug1Z2EJ_U";
 
 export function BrainrotPanel() {
   const src = `https://www.youtube-nocookie.com/embed/${YT_ID}?autoplay=1&mute=1&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3`;
