@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --muted: #8a8580;
+  --accent: #d4af37;
+  --accent-soft: rgba(212, 175, 55, 0.15);
+  --panel: #131210;
+  --line: #1f1d1a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background-image:
+    radial-gradient(1100px 600px at 80% -10%, rgba(212, 175, 55, 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(212, 175, 55, 0.05), transparent 65%);
+  background-attachment: fixed;
+  letter-spacing: 0.005em;
+}
+
+.serif { font-family: var(--font-playfair), Georgia, serif; }
+
+.portrait-vignette {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.portrait-vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 30%, transparent 50%, rgba(0,0,0,0.55) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 35%);
+  pointer-events: none;
+  z-index: 1;
+}
+.portrait-vignette img {
+  filter: saturate(0.78) contrast(1.05) brightness(0.92);
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 400ms;
+}
+.portrait-vignette:hover img,
+.portrait-vignette:focus-within img {
+  transform: scale(1.04);
+  filter: saturate(0.95) contrast(1.08) brightness(1);
+}
+.portrait-vignette .portrait-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.6),
+    0 0 60px 8px rgba(212, 175, 55, 0.35);
+  z-index: 2;
+}
+.portrait-vignette:hover .portrait-glow,
+.portrait-vignette:focus-within .portrait-glow {
+  opacity: 1;
+}
+
+.divider-vs {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-style: italic;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+}
+
+.wordmark {
+  font-family: var(--font-playfair), Georgia, serif;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
+}
