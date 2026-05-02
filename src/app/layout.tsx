@@ -6,6 +6,8 @@ import { WalletProvider } from "@/components/WalletProvider";
 import { BrainrotPanel } from "@/components/BrainrotPanel";
 import { SlotMachine } from "@/components/SlotMachine";
 import { KirkClicker } from "@/components/KirkClicker";
+import { KirkRain } from "@/components/KirkRain";
+import { KirkTicker } from "@/components/KirkTicker";
 import { FloatingDebris } from "@/components/FloatingDebris";
 import "./globals.css";
 
@@ -51,6 +53,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <BrainrotPanel />
             <SlotMachine />
             <KirkClicker />
+            <KirkRain />
+            <KirkTicker />
           </WalletProvider>
         </AuthProvider>
       </body>
