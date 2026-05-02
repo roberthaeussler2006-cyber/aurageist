@@ -20,6 +20,10 @@ export default function LeaderboardPage() {
             <Link href="/leaderboard/discussed" className="hover:text-accent transition-colors">
               most discussed →
             </Link>
+            <span className="text-muted/40">·</span>
+            <Link href="/leaderboard/divisive" className="hover:text-accent transition-colors">
+              most divisive →
+            </Link>
           </div>
         </header>
         <LeaderboardClient category="historical" />
