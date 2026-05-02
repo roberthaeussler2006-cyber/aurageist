@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getServerSupabase } from "@/lib/supabase";
 import { usernameToEmail } from "@/lib/username";
 
 export const dynamic = "force-dynamic";
@@ -19,21 +18,36 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    return NextResponse.json({ error: "server misconfigured" }, { status: 500 });
+  }
+
   const username = body.username.toLowerCase();
   const email = usernameToEmail(username);
-  const supabase = getServerSupabase();
 
-  const { error } = await supabase.auth.admin.createUser({
-    email,
-    password: body.password,
-    email_confirm: true,
-    user_metadata: { username },
+  const res = await fetch(`${url}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password: body.password,
+      email_confirm: true,
+      user_metadata: { username },
+    }),
   });
 
-  if (error) {
-    const msg = /already.*registered|exists/i.test(error.message)
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { msg?: string; message?: string; error?: string };
+    const raw = data.msg ?? data.message ?? data.error ?? `signup failed (${res.status})`;
+    const msg = /already.*registered|already.*exists|duplicate/i.test(raw)
       ? "username already taken"
-      : error.message;
+      : raw;
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
