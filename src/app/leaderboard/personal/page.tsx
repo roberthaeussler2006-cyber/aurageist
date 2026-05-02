@@ -78,8 +78,10 @@ export default function PersonalLeaderboardPage() {
         <header className="text-center mb-10">
           <div className="text-[10px] uppercase tracking-[0.3em] text-muted">Your taste</div>
           <h1 className="serif text-4xl sm:text-5xl mt-2 italic">Personal Ranking</h1>
-          {user?.email && (
-            <div className="mt-2 text-[10px] uppercase tracking-[0.25em] text-muted">{user.email}</div>
+          {user && (
+            <div className="mt-2 text-[10px] uppercase tracking-[0.25em] text-muted">
+              {(user.user_metadata?.username as string | undefined) ?? user.email}
+            </div>
           )}
           <div className="mt-4 inline-flex border border-line text-[10px] uppercase tracking-[0.25em]">
             {(["historical", "current"] as Category[]).map((c) => (
