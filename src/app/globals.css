@@ -350,6 +350,20 @@ img { -webkit-user-select: none; user-select: none; }
 /* Respect iOS safe areas at the bottom of fixed/sticky elements */
 .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
 
+/* Butterfly wing flap. Each butterfly sets --flap-ms inline so the swarm
+   doesn't beat in unison. */
+@keyframes bf-flap-l {
+  0%, 100% { transform: rotateY(-12deg) rotate(0deg); }
+  50%      { transform: rotateY(78deg) rotate(-4deg); }
+}
+@keyframes bf-flap-r {
+  0%, 100% { transform: rotateY(12deg) rotate(0deg); }
+  50%      { transform: rotateY(-78deg) rotate(4deg); }
+}
+.butterfly { perspective: 200px; display: inline-block; line-height: 0; }
+.bf-wing-l { animation: bf-flap-l var(--flap-ms, 320ms) ease-in-out infinite; transform-origin: 0 0; transform-box: fill-box; }
+.bf-wing-r { animation: bf-flap-r var(--flap-ms, 320ms) ease-in-out infinite; transform-origin: 0 0; transform-box: fill-box; }
+
 ::selection {
   background: var(--accent);
   color: #fff;
