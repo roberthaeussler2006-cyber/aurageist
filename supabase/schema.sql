@@ -42,6 +42,43 @@ create index if not exists figures_category_elo_idx on figures (category, elo de
 create index if not exists figures_category_matches_idx on figures (category, matches asc);
 create index if not exists matches_created_idx on matches (created_at desc);
 
+create table if not exists comments (
+  id uuid primary key default gen_random_uuid(),
+  figure_id uuid not null references figures(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  author_name text not null,
+  body text not null check (length(body) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists comments_figure_created_idx on comments (figure_id, created_at desc);
+
+alter table comments enable row level security;
+
+do $$
+begin
+  create policy "Comments are readable by anyone"
+    on comments for select
+    using (true);
+exception when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  create policy "Users can insert their own comments"
+    on comments for insert
+    with check (auth.uid() = user_id);
+exception when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  create policy "Users can delete their own comments"
+    on comments for delete
+    using (auth.uid() = user_id);
+exception when duplicate_object then null;
+end $$;
+
 insert into storage.buckets (id, name, public)
 values ('portraits', 'portraits', true)
 on conflict (id) do nothing;
