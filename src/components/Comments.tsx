@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState, useCallback, FormEvent } from "react";
-import Link from "next/link";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 import { useAuth } from "@/components/AuthProvider";
 
 type Comment = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   author_name: string;
   body: string;
   created_at: string;
 };
 
 const MAX_LEN = 1000;
+const MAX_NAME_LEN = 40;
 const COMPACT_LIMIT = 5;
+const NAME_KEY = "aurageist-anon-name";
 
 export function Comments({
   figureId,
@@ -26,8 +27,15 @@ export function Comments({
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [body, setBody] = useState("");
+  const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem(NAME_KEY);
+    if (saved) setName(saved);
+  }, []);
 
   const load = useCallback(async () => {
     const { data, error } = await getBrowserSupabase()
@@ -49,15 +57,25 @@ export function Comments({
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!user) return;
     const trimmed = body.trim();
     if (!trimmed) return;
+
+    let author_name: string;
+    if (user) {
+      author_name = (user.email ?? "anon").split("@")[0];
+    } else {
+      const trimmedName = name.trim();
+      author_name = (trimmedName || "anon").slice(0, MAX_NAME_LEN);
+      if (typeof window !== "undefined" && trimmedName) {
+        window.localStorage.setItem(NAME_KEY, trimmedName);
+      }
+    }
+
     setSubmitting(true);
     setError(null);
-    const author_name = (user.email ?? "anon").split("@")[0];
     const { error } = await getBrowserSupabase().from("comments").insert({
       figure_id: figureId,
-      user_id: user.id,
+      user_id: user?.id ?? null,
       author_name,
       body: trimmed.slice(0, MAX_LEN),
     });
@@ -88,36 +106,36 @@ export function Comments({
         Comments {comments ? `(${comments.length})` : ""}
       </h2>
 
-      {user ? (
-        <form onSubmit={submit} className={`border border-line bg-panel/30 ${compact ? "p-2 mb-3" : "p-3 mb-6"}`}>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
-            placeholder="Share your take…"
-            rows={compact ? 2 : 3}
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none resize-none"
+      <form onSubmit={submit} className={`border border-line bg-panel/30 ${compact ? "p-2 mb-3" : "p-3 mb-6"}`}>
+        {!user && (
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value.slice(0, MAX_NAME_LEN))}
+            placeholder="Your name (optional)"
+            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none border-b border-line/50 pb-1 mb-2"
           />
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-muted/70">
-              {body.length}/{MAX_LEN}
-            </span>
-            <button
-              type="submit"
-              disabled={submitting || !body.trim()}
-              className="px-4 py-2 border border-accent/60 text-accent uppercase tracking-[0.25em] text-[10px] hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              {submitting ? "Posting…" : "Post"}
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="border border-line bg-panel/30 p-4 mb-6 text-sm text-foreground/70">
-          <Link href="/auth" className="text-accent hover:underline">
-            Sign in
-          </Link>{" "}
-          to leave a comment.
+        )}
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value.slice(0, MAX_LEN))}
+          placeholder="Share your take…"
+          rows={compact ? 2 : 3}
+          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted/60 focus:outline-none resize-none"
+        />
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-muted/70">
+            {body.length}/{MAX_LEN}
+          </span>
+          <button
+            type="submit"
+            disabled={submitting || !body.trim()}
+            className="px-4 py-2 border border-accent/60 text-accent uppercase tracking-[0.25em] text-[10px] hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {submitting ? "Posting…" : "Post"}
+          </button>
         </div>
-      )}
+      </form>
 
       {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
 
@@ -133,7 +151,7 @@ export function Comments({
                 <span className="text-accent/80">{c.author_name}</span>
                 <span className="flex items-center gap-3">
                   <span>{new Date(c.created_at).toLocaleDateString()}</span>
-                  {user?.id === c.user_id && (
+                  {user && c.user_id && user.id === c.user_id && (
                     <button
                       onClick={() => remove(c.id)}
                       className="hover:text-red-400 transition-colors"
