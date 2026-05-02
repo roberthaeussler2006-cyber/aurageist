@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const DISMISS_KEY = "brainrot-dismissed";
 // Swap this for whatever YouTube video ID you want looping.
-const YT_ID = "Vp6-J8qQ3Ng";
+const YT_ID = "9q6eL3iSATM";
 
 export function BrainrotPanel() {
   const [visible, setVisible] = useState(false);
