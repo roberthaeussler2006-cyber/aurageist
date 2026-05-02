@@ -68,7 +68,7 @@ export function MatchupClient({
         setStatus("error");
       });
     return () => controller.abort();
-  }, [reloadKey, category]);
+  }, [reloadKey, category, theme]);
 
   // After a matchup is on screen, fetch the next one in the background and
   // warm the browser image cache so the swap after a vote feels instant.
