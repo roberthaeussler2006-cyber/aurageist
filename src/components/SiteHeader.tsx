@@ -45,6 +45,12 @@ export function SiteHeader() {
           >
             Upsets
           </Link>
+          <Link
+            href="/stats"
+            className="px-2.5 sm:px-3 py-1.5 rounded-full text-muted hover:text-accent hover:bg-white/60 transition-all"
+          >
+            Stats
+          </Link>
           {!loading && user && (
             <Link
               href="/leaderboard/personal"
