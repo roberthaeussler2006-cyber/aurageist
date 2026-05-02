@@ -32,6 +32,8 @@ export type MatchupResponse = {
 export type VoteResponse = {
   winnerNewElo: number;
   loserNewElo: number;
+  personalWinnerNewElo: number | null;
+  personalLoserNewElo: number | null;
 };
 
 export type RecentMatch = {

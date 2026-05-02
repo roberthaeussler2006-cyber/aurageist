@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/types";
 import { FigureBlurb, formatYears } from "./FigureBlurb";
+import { useAuth } from "./AuthProvider";
 
 type VoteResult = {
   winnerId: string;
@@ -23,6 +24,7 @@ export function MatchupClient({ category = "historical" }: { category?: Category
   const [voteResult, setVoteResult] = useState<VoteResult | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { session } = useAuth();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -66,9 +68,13 @@ export function MatchupClient({ category = "historical" }: { category?: Category
     (winner: Figure, loser: Figure) => {
       if (!matchup || submitting) return;
       setSubmitting(true);
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
       fetch("/api/vote", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           winnerId: winner.id,
           loserId: loser.id,
@@ -95,7 +101,7 @@ export function MatchupClient({ category = "historical" }: { category?: Category
           setSubmitting(false);
         });
     },
-    [matchup, submitting],
+    [matchup, submitting, session],
   );
 
   useEffect(() => {
