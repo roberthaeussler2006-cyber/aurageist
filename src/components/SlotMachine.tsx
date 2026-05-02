@@ -4,14 +4,18 @@ import { useEffect, useRef, useState } from "react";
 
 type SlotFig = { name: string; image_url: string | null };
 
+const CHARLI_IMG =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Charlie_Kirk_%2853952923573%29_%28headshot_cropped%29.jpg/440px-Charlie_Kirk_%2853952923573%29_%28headshot_cropped%29.jpg";
+
 const CHARLI: SlotFig = {
   name: "CHARLI",
-  image_url: null,
+  image_url: CHARLI_IMG,
 };
 
 const SPIN_MS = 1800;
 const TICK_MS = 80;
 const STAGGER_MS = 350;
+const TAKEOVER_MS = 3000;
 
 export function SlotMachine() {
   const [open, setOpen] = useState(false);
@@ -74,6 +78,9 @@ export function SlotMachine() {
           });
           if (i === 2) {
             setJackpot(true);
+            timersRef.current.push(
+              setTimeout(() => setJackpot(false), TAKEOVER_MS),
+            );
           }
         }, stopAt),
       );
@@ -82,7 +89,9 @@ export function SlotMachine() {
 
   if (!open) {
     return (
-      <button
+      <>
+        {jackpot && <CharliTakeover />}
+        <button
         type="button"
         onClick={() => setOpen(true)}
         className="fixed top-20 sm:top-24 right-4 sm:right-6 z-50 h-14 w-14 rounded-full bg-gradient-to-br from-fuchsia-500 to-amber-400 shadow-lg hover:scale-110 transition-transform grid place-items-center text-3xl"
@@ -90,11 +99,14 @@ export function SlotMachine() {
         title="Slot machine"
       >
         🎰
-      </button>
+        </button>
+      </>
     );
   }
 
   return (
+    <>
+    {jackpot && <CharliTakeover />}
     <div className="fixed top-20 sm:top-24 right-4 sm:right-6 z-50 w-[min(92vw,460px)] rounded-3xl bg-white border border-line shadow-2xl overflow-hidden">
       <div className="bg-gradient-to-r from-fuchsia-500 via-rose-500 to-amber-400 px-5 py-3.5 flex items-center justify-between text-white">
         <div className="flex items-center gap-2.5">
@@ -144,6 +156,29 @@ export function SlotMachine() {
         </p>
       </div>
     </div>
+    </>
+  );
+}
+
+function CharliTakeover() {
+  return (
+    <div className="fixed inset-0 z-[100] bg-black grid place-items-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={CHARLI_IMG}
+        alt="CHARLI"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="relative text-center px-6">
+        <p className="text-7xl sm:text-9xl font-black tracking-tight text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]">
+          CHARLI
+        </p>
+        <p className="mt-3 text-2xl sm:text-3xl font-bold text-white/90 uppercase tracking-[0.3em] drop-shadow-lg">
+          ✨ JACKPOT ✨
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -157,7 +192,10 @@ function Reel({ fig, spinning }: { fig: SlotFig; spinning: boolean }) {
           : "border-line bg-white"
       } ${spinning ? "animate-pulse" : ""}`}
     >
-      {isCharli ? (
+      {isCharli && fig.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={fig.image_url} alt="CHARLI" className="h-full w-full object-cover" />
+      ) : isCharli ? (
         <div className="text-center px-1">
           <div className="text-4xl sm:text-5xl">✨</div>
           <div className="text-base sm:text-lg font-black tracking-tight bg-gradient-to-r from-fuchsia-600 to-amber-500 bg-clip-text text-transparent">

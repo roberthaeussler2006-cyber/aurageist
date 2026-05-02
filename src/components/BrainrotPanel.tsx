@@ -17,7 +17,7 @@ export function BrainrotPanel() {
 
   if (!visible) return null;
 
-  const src = `https://www.youtube-nocookie.com/embed/${YT_ID}?autoplay=1&mute=1&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&playsinline=1&rel=0`;
+  const src = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&mute=1&loop=1&playlist=${YT_ID}&controls=1&modestbranding=1&playsinline=1&rel=0`;
 
   return (
     <div className="fixed bottom-3 right-3 z-50 w-[120px] sm:w-[140px] aspect-[9/16] rounded-xl overflow-hidden shadow-2xl ring-1 ring-black/20 bg-black group">
@@ -26,7 +26,7 @@ export function BrainrotPanel() {
         title="brainrot"
         allow="autoplay; encrypted-media; picture-in-picture"
         allowFullScreen={false}
-        className="w-full h-full pointer-events-none"
+        className="w-full h-full"
       />
       <button
         type="button"
