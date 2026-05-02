@@ -134,18 +134,18 @@ export function MatchupClient({ category = "historical" }: { category?: Category
   const subtitle = category === "current" ? "Current figures" : "Historical figures";
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start px-3 sm:px-6 pb-10 pt-4 sm:pt-6">
-      <div className="w-full max-w-6xl text-center mb-6 sm:mb-10">
-        <div className="flex items-center justify-center gap-3 mb-4">
+    <div className="flex-1 flex flex-col items-center justify-start px-3 sm:px-6 pb-10 pt-3 sm:pt-6">
+      <div className="w-full max-w-6xl text-center mb-4 sm:mb-10">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
           <span className="pill">{subtitle}</span>
           <Link href={otherHref} className="btn-ghost">
             try {otherCategory} →
           </Link>
         </div>
-        <h1 className="display text-[clamp(2.75rem,9vw,7rem)]">
+        <h1 className="display text-[clamp(2rem,8vw,7rem)]">
           who has more <span className="display-italic text-gradient">aura</span>?
         </h1>
-        <p className="mt-3 text-sm sm:text-base text-foreground/60 max-w-md mx-auto">
+        <p className="hidden sm:block mt-3 text-sm sm:text-base text-foreground/60 max-w-md mx-auto">
           Tap a portrait. Trust your gut. The Elo updates in real time.
         </p>
       </div>
@@ -205,41 +205,86 @@ function PairLayout({
   voteResult: VoteResult | null;
 }) {
   return (
-    <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-12 items-stretch">
-      <div className="md:tilt-left flex flex-col">
-        <FigureChoice
-          figure={a}
-          onClick={() => onVote(a, b)}
-          disabled={disabled}
-          delta={
-            voteResult?.winnerId === a.id
-              ? voteResult.winnerDelta
-              : voteResult?.loserId === a.id
-                ? voteResult.loserDelta
-                : null
-          }
-          won={voteResult?.winnerId === a.id}
-          lost={voteResult?.loserId === a.id}
-          side="left"
-        />
-        <Comments figureId={a.id} compact />
+    <div className="relative">
+      <div className="relative grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] gap-2.5 sm:gap-4 md:gap-12 items-stretch">
+        <div className="md:tilt-left flex flex-col min-w-0">
+          <FigureChoice
+            figure={a}
+            onClick={() => onVote(a, b)}
+            disabled={disabled}
+            delta={
+              voteResult?.winnerId === a.id
+                ? voteResult.winnerDelta
+                : voteResult?.loserId === a.id
+                  ? voteResult.loserDelta
+                  : null
+            }
+            won={voteResult?.winnerId === a.id}
+            lost={voteResult?.loserId === a.id}
+            side="left"
+          />
+          <div className="hidden md:block">
+            <Comments figureId={a.id} compact />
+          </div>
+        </div>
+
+        <div className="hidden md:flex flex-col items-center justify-center gap-4 z-10">
+          <span className="display-italic text-7xl divider-vs leading-none">vs</span>
+          <button
+            type="button"
+            onClick={onSkip}
+            disabled={disabled}
+            className="btn-ghost"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 4l8 8-8 8M13 4l8 8-8 8" />
+            </svg>
+            Skip
+          </button>
+        </div>
+
+        <div className="md:tilt-right flex flex-col min-w-0">
+          <FigureChoice
+            figure={b}
+            onClick={() => onVote(b, a)}
+            disabled={disabled}
+            delta={
+              voteResult?.winnerId === b.id
+                ? voteResult.winnerDelta
+                : voteResult?.loserId === b.id
+                  ? voteResult.loserDelta
+                  : null
+            }
+            won={voteResult?.winnerId === b.id}
+            lost={voteResult?.loserId === b.id}
+            side="right"
+          />
+          <div className="hidden md:block">
+            <Comments figureId={b.id} compact />
+          </div>
+        </div>
+
+        {/* Mobile-only "vs" badge floating between the two cards */}
+        <span
+          aria-hidden
+          className="md:hidden absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 display-italic text-3xl divider-vs pointer-events-none drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)] z-10"
+        >
+          vs
+        </span>
       </div>
 
-      <div className="flex md:flex-col items-center justify-center gap-4 py-2 md:py-0 z-10">
-        <div className="hidden md:flex flex-col items-center">
-          <span className="display-italic text-7xl divider-vs leading-none">vs</span>
-        </div>
-        <div className="md:hidden display-italic text-5xl divider-vs">vs</div>
+      {/* Mobile-only Skip below the cards */}
+      <div className="md:hidden flex items-center justify-center mt-5">
         <button
           type="button"
           onClick={onSkip}
           disabled={disabled}
-          className="btn-ghost"
+          className="btn-ghost px-5 py-3 text-[11px]"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 4l8 8-8 8M13 4l8 8-8 8" />
           </svg>
-          Skip
+          Skip — I don&apos;t know
         </button>
         <Link
           href={`/vs/${encodeURIComponent(a.wiki_slug)}/${encodeURIComponent(b.wiki_slug)}`}
@@ -247,25 +292,6 @@ function PairLayout({
         >
           Share
         </Link>
-      </div>
-
-      <div className="md:tilt-right flex flex-col">
-        <FigureChoice
-          figure={b}
-          onClick={() => onVote(b, a)}
-          disabled={disabled}
-          delta={
-            voteResult?.winnerId === b.id
-              ? voteResult.winnerDelta
-              : voteResult?.loserId === b.id
-                ? voteResult.loserDelta
-                : null
-          }
-          won={voteResult?.winnerId === b.id}
-          lost={voteResult?.loserId === b.id}
-          side="right"
-        />
-        <Comments figureId={b.id} compact />
       </div>
     </div>
   );
@@ -319,21 +345,23 @@ function FigureChoice({
               no portrait
             </div>
           )}
-          <div className={`absolute bottom-3 ${side === "left" ? "left-3" : "right-3"} z-20`}>
+          <div className={`hidden md:block absolute bottom-3 ${side === "left" ? "left-3" : "right-3"} z-20`}>
             <span className="pill-dark backdrop-blur-md bg-black/55">
               {side === "left" ? "← Left" : "Right →"}
             </span>
           </div>
         </div>
 
-        <div className="px-5 sm:px-7 py-5 sm:py-6">
-          <h2 className="display-italic text-3xl sm:text-4xl leading-tight text-foreground">
+        <div className="px-3 py-3 sm:px-7 sm:py-6">
+          <h2 className="display-italic text-lg sm:text-4xl leading-tight text-foreground line-clamp-2 sm:line-clamp-none">
             {figure.name}
           </h2>
-          <div className="text-[11px] uppercase tracking-[0.16em] font-bold text-muted mt-1.5">
+          <div className="text-[9px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.16em] font-bold text-muted mt-1 sm:mt-1.5 truncate">
             {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
           </div>
-          <FigureBlurb text={figure.short_blurb} />
+          <div className="hidden sm:block">
+            <FigureBlurb text={figure.short_blurb} />
+          </div>
           {figure.category === "current" && (
             <CardRanks
               fame={figure.fame_rank}
@@ -413,18 +441,18 @@ function CardRanks({
     },
   ];
   return (
-    <div className="mt-4 space-y-2">
+    <div className="mt-3 sm:mt-4 space-y-1.5 sm:space-y-2">
       {items.map((i) => (
         <div key={i.label}>
-          <div className="flex items-baseline justify-between mb-1">
-            <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-muted">
+          <div className="flex items-baseline justify-between mb-0.5 sm:mb-1 gap-2">
+            <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.12em] sm:tracking-[0.16em] font-bold text-muted truncate">
               {i.label}
             </span>
-            <span className="text-xs font-bold tabular-nums text-foreground/85">
+            <span className="text-[10px] sm:text-xs font-bold tabular-nums text-foreground/85 shrink-0">
               {i.display}
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-line/60 overflow-hidden">
+          <div className="h-1 sm:h-1.5 w-full rounded-full bg-line/60 overflow-hidden">
             <div
               className={`h-full bg-gradient-to-r ${i.tone} rounded-full`}
               style={{ width: `${i.pct}%` }}
@@ -443,7 +471,7 @@ function SkeletonPair() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-12"
+      className="grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] gap-2.5 sm:gap-4 md:gap-12"
     >
       <div className="md:tilt-left">
         <div className="glass-card aspect-[3/4] sm:aspect-[4/5] animate-pulse overflow-hidden">

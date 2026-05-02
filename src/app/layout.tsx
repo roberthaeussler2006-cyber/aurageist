@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AuthProvider } from "@/components/AuthProvider";
@@ -19,6 +19,13 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Aurageist — who has more aura?",
   description: "Vote between two historical figures. Whoever has more aura wins.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fafaf7",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

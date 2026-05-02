@@ -38,11 +38,11 @@ export function SocialLink({
   };
 
   if (variant === "overlay") {
-    const cornerClass = corner === "top-left" ? "top-3 left-3" : "top-3 right-3";
+    const cornerClass = corner === "top-left" ? "top-2 left-2 sm:top-3 sm:left-3" : "top-2 right-2 sm:top-3 sm:right-3";
     return (
       <a
         {...baseProps}
-        className={`absolute ${cornerClass} z-30 h-9 w-9 rounded-full bg-white/95 backdrop-blur ring-1 ring-line shadow-md flex items-center justify-center text-foreground hover:bg-white hover:scale-110 active:scale-95 transition-all`}
+        className={`absolute ${cornerClass} z-30 h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 backdrop-blur ring-1 ring-line shadow-md flex items-center justify-center text-foreground hover:bg-white hover:scale-110 active:scale-95 transition-all`}
       >
         <SocialIcon kind={kind} />
       </a>
