@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import type { FigureDetailResponse } from "@/lib/types";
@@ -49,10 +50,17 @@ export default async function FigurePage({
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 sm:gap-10 mt-6">
-          <div className="portrait-bright aspect-[3/4] w-full md:w-[280px] rounded-3xl overflow-hidden shadow-[var(--shadow)]">
+          <div className="portrait-bright aspect-[3/4] w-full md:w-[280px] rounded-3xl overflow-hidden shadow-[var(--shadow)] relative">
             {figure.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={figure.image_url} alt={figure.name} className="h-full w-full object-cover" />
+              <Image
+                src={figure.image_url}
+                alt={figure.name}
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 100vw, 280px"
+                className="object-cover"
+              />
             ) : (
               <div className="h-full w-full bg-[#f4f4f5] grid place-items-center text-muted text-xs uppercase tracking-widest">
                 no portrait
@@ -121,10 +129,16 @@ export default async function FigurePage({
                     >
                       {m.outcome === "win" ? "Beat" : "Lost to"}
                     </span>
-                    <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-line shrink-0">
+                    <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-line shrink-0 relative">
                       {m.opponent.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={m.opponent.image_url} alt={m.opponent.name} className="h-full w-full object-cover" />
+                        <Image
+                          src={m.opponent.image_url}
+                          alt={m.opponent.name}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                          loading="lazy"
+                        />
                       ) : (
                         <div className="h-full w-full bg-line" />
                       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Category, Figure } from "@/lib/types";
@@ -111,11 +112,12 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
 
         <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full overflow-hidden ring-2 ring-line group-hover:ring-accent/40 transition-all">
           {figure.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={figure.image_url}
               alt={figure.name}
-              className="h-full w-full object-cover"
+              fill
+              sizes="56px"
+              className="object-cover"
               loading="lazy"
             />
           ) : (

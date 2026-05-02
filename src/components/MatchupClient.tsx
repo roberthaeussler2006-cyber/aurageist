@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Category, Figure, MatchupResponse, VoteResponse } from "@/lib/types";
@@ -34,9 +35,22 @@ export function MatchupClient({
   const [voteResult, setVoteResult] = useState<VoteResult | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cached next matchup, prefetched after the current one renders. When we
+  // advance, we use this immediately instead of showing a skeleton.
+  const prefetched = useRef<MatchupResponse | null>(null);
   const { session } = useAuth();
 
   useEffect(() => {
+    // If we have a prefetched matchup ready, use it without a network round-trip.
+    if (prefetched.current) {
+      const next = prefetched.current;
+      prefetched.current = null;
+      setMatchup(next);
+      setVoteResult(null);
+      setSubmitting(false);
+      setStatus("ready");
+      return;
+    }
     const controller = new AbortController();
     const qs = theme ? `theme=${encodeURIComponent(theme)}` : `cat=${category}`;
     fetch(`/api/matchup?${qs}`, { cache: "no-store", signal: controller.signal })
@@ -55,6 +69,35 @@ export function MatchupClient({
       });
     return () => controller.abort();
   }, [reloadKey, category]);
+
+  // After a matchup is on screen, fetch the next one in the background and
+  // warm the browser image cache so the swap after a vote feels instant.
+  useEffect(() => {
+    if (status !== "ready" || !matchup || prefetched.current) return;
+    const controller = new AbortController();
+    const id = setTimeout(() => {
+      fetch(`/api/matchup?cat=${category}`, { cache: "no-store", signal: controller.signal })
+        .then(async (res) => {
+          if (!res.ok) return;
+          const json = (await res.json()) as MatchupResponse;
+          prefetched.current = json;
+          // Warm the image cache so the next portrait is decoded by paint time.
+          if (typeof window !== "undefined") {
+            for (const url of [json.a.image_url, json.b.image_url]) {
+              if (!url) continue;
+              const img = new window.Image();
+              img.decoding = "async";
+              img.src = url;
+            }
+          }
+        })
+        .catch(() => {});
+    }, 250);
+    return () => {
+      clearTimeout(id);
+      controller.abort();
+    };
+  }, [status, matchup, category]);
 
   useEffect(() => {
     return () => {
@@ -339,14 +382,16 @@ function FigureChoice({
         } ${lost ? "opacity-45 saturate-50" : ""}`}
         style={wonStyle}
       >
-        <div className="portrait-frame aspect-[3/4] sm:aspect-[4/5] w-full">
+        <div className="portrait-frame aspect-[3/4] sm:aspect-[4/5] w-full relative">
           {figure.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={figure.image_url}
               alt={figure.name}
-              className="h-full w-full object-cover"
-              loading="eager"
+              fill
+              priority
+              fetchPriority="high"
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 480px"
+              className="object-cover"
               draggable={false}
             />
           ) : (
