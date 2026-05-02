@@ -6,6 +6,7 @@ import { WalletProvider } from "@/components/WalletProvider";
 import { BrainrotPanel } from "@/components/BrainrotPanel";
 import { SlotMachine } from "@/components/SlotMachine";
 import { KirkClicker } from "@/components/KirkClicker";
+import { FloatingDebris } from "@/components/FloatingDebris";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <div className="noise-overlay" aria-hidden />
+        <FloatingDebris />
         <AuthProvider>
           <WalletProvider>
             <SiteHeader />
