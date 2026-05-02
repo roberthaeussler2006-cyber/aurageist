@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AuthProvider } from "@/components/AuthProvider";
+import { BrainrotPanel } from "@/components/BrainrotPanel";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span aria-hidden className="text-muted/30">·</span>
             <span title="for marc — yes the 67 is on purpose" className="tracking-[0.3em]">67</span>
           </footer>
+          <BrainrotPanel />
         </AuthProvider>
       </body>
     </html>
