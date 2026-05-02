@@ -108,6 +108,21 @@ end;
 $$;
 
 grant execute on function increment_comment_upvote(uuid) to anon, authenticated;
+
+create or replace view figure_comment_counts as
+select
+  f.id,
+  f.name,
+  f.wiki_slug,
+  f.image_url,
+  f.category,
+  f.elo,
+  count(c.id)::int as comment_count
+from figures f
+left join comments c on c.figure_id = f.id
+group by f.id, f.name, f.wiki_slug, f.image_url, f.category, f.elo;
+
+grant select on figure_comment_counts to anon, authenticated;
 create index if not exists comments_parent_idx on comments (parent_id);
 create index if not exists comments_figure_root_created_idx
   on comments (figure_id, created_at desc)

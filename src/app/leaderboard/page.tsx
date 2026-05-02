@@ -12,9 +12,13 @@ export default function LeaderboardPage() {
           <h1 className="text-4xl sm:text-5xl mt-3 font-bold tracking-tight">
             <span className="text-gradient">Historical</span> Leaderboard
           </h1>
-          <div className="mt-4 text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">
+          <div className="mt-4 text-[11px] uppercase tracking-[0.18em] font-semibold text-muted flex items-center justify-center gap-3">
             <Link href="/leaderboard/current" className="hover:text-accent transition-colors">
-              see current figures →
+              current →
+            </Link>
+            <span className="text-muted/40">·</span>
+            <Link href="/leaderboard/discussed" className="hover:text-accent transition-colors">
+              most discussed →
             </Link>
           </div>
         </header>
