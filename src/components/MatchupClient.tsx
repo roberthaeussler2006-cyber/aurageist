@@ -122,10 +122,12 @@ export function MatchupClient({ category = "historical" }: { category?: Category
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 pb-10 pt-2">
-      <div className="text-[10px] uppercase tracking-[0.3em] text-muted mb-6 sm:mb-8 flex items-center gap-3">
-        <span className="text-accent">{subtitle}</span>
-        <span className="text-muted/40">·</span>
-        <Link href={otherHref} className="hover:text-accent transition-colors">
+      <div className="mb-6 sm:mb-8 flex items-center gap-3">
+        <span className="pill">{subtitle}</span>
+        <Link
+          href={otherHref}
+          className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent transition-colors"
+        >
           try {otherCategory} →
         </Link>
       </div>
@@ -199,21 +201,19 @@ function PairLayout({
       />
 
       <div className="flex md:flex-col items-center justify-center gap-3 md:gap-4 py-2 md:py-0">
-        <span className="hidden md:block h-20 w-px bg-line" />
         <div className="text-center">
-          <div className="serif text-2xl md:text-3xl italic text-foreground/90">who has more</div>
-          <div className="serif text-3xl md:text-5xl italic divider-vs mt-1">aura</div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-muted mt-2">tap to vote</div>
+          <div className="text-sm uppercase tracking-[0.25em] font-semibold text-muted">who has more</div>
+          <div className="serif text-4xl md:text-6xl italic divider-vs leading-none mt-1">aura</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted mt-3">tap to vote</div>
         </div>
         <button
           type="button"
           onClick={onSkip}
           disabled={disabled}
-          className="px-4 py-2 border border-line text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent hover:border-accent/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+          className="px-5 py-2 rounded-full border border-line bg-panel text-[10px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent hover:border-accent/40 hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-default"
         >
           I don&apos;t know
         </button>
-        <span className="hidden md:block h-20 w-px bg-line" />
       </div>
 
       <FigureChoice
@@ -258,12 +258,12 @@ function FigureChoice({
       aria-label={`Vote ${figure.name} as having more aura`}
       onClick={onClick}
       disabled={disabled}
-      className={`group relative text-left bg-panel/40 rounded-[2px] border border-line transition-all duration-300 overflow-hidden ${
-        disabled ? "cursor-default" : "cursor-pointer hover:border-accent/40 active:scale-[0.99]"
-      } ${won ? "ring-2 ring-accent/80" : ""} ${lost ? "opacity-50" : ""}`}
+      className={`card-bright group relative text-left overflow-hidden ${
+        disabled ? "cursor-default" : "cursor-pointer active:scale-[0.985]"
+      } ${won ? "ring-4 ring-offset-2 ring-offset-background" : ""} ${lost ? "opacity-50" : ""}`}
+      style={won ? { borderColor: "var(--accent)", boxShadow: "0 0 0 4px var(--accent-soft), var(--shadow-lg)" } : undefined}
     >
-      <div className="portrait-vignette aspect-[3/4] sm:aspect-[4/5] w-full">
-        <span className="portrait-glow" />
+      <div className="portrait-bright aspect-[3/4] sm:aspect-[4/5] w-full">
         {figure.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -274,17 +274,17 @@ function FigureChoice({
             draggable={false}
           />
         ) : (
-          <div className="h-full w-full grid place-items-center bg-[#1a1815] text-muted text-xs uppercase tracking-widest">
+          <div className="h-full w-full grid place-items-center bg-[#f4f4f5] text-muted text-xs uppercase tracking-widest">
             no portrait
           </div>
         )}
       </div>
 
-      <div className="relative z-10 px-4 sm:px-5 py-4 -mt-12">
-        <h2 className="serif text-2xl sm:text-3xl leading-tight text-foreground drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+      <div className="px-5 sm:px-6 py-4 sm:py-5">
+        <h2 className="serif text-2xl sm:text-3xl leading-tight text-foreground">
           {figure.name}
         </h2>
-        <div className="text-[11px] uppercase tracking-[0.2em] text-muted mt-1">
+        <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mt-1">
           {formatYears(figure.birth_year, figure.death_year) ?? "—"}
         </div>
         <FigureBlurb text={figure.short_blurb} />
@@ -293,15 +293,15 @@ function FigureChoice({
       <AnimatePresence>
         {delta !== null && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+            initial={{ opacity: 0, y: -8, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className={`absolute top-3 ${side === "left" ? "left-3" : "right-3"} z-20`}
+            transition={{ duration: 0.45, type: "spring", stiffness: 220, damping: 18 }}
+            className={`absolute top-4 ${side === "left" ? "left-4" : "right-4"} z-20`}
           >
             <span
-              className={`serif text-3xl sm:text-4xl italic ${
-                delta >= 0 ? "text-accent" : "text-foreground/50"
+              className={`inline-flex items-center px-3 py-1.5 rounded-full text-base sm:text-lg font-bold tabular-nums shadow-lg ${
+                delta >= 0 ? "bg-gradient text-white" : "bg-white text-foreground/60 border border-line"
               }`}
             >
               {delta >= 0 ? "+" : ""}
@@ -323,11 +323,15 @@ function SkeletonPair() {
       exit={{ opacity: 0 }}
       className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10"
     >
-      <div className="aspect-[3/4] sm:aspect-[4/5] bg-panel/60 rounded-[2px] border border-line animate-pulse" />
-      <div className="hidden md:flex items-center justify-center serif italic divider-vs text-3xl">
-        ...
+      <div className="card-bright aspect-[3/4] sm:aspect-[4/5] animate-pulse">
+        <div className="portrait-bright h-full w-full bg-[#f4f4f5]" />
       </div>
-      <div className="aspect-[3/4] sm:aspect-[4/5] bg-panel/60 rounded-[2px] border border-line animate-pulse" />
+      <div className="hidden md:flex items-center justify-center serif italic divider-vs text-4xl">
+        vs
+      </div>
+      <div className="card-bright aspect-[3/4] sm:aspect-[4/5] animate-pulse">
+        <div className="portrait-bright h-full w-full bg-[#f4f4f5]" />
+      </div>
     </motion.div>
   );
 }
@@ -339,11 +343,11 @@ function ErrorBlock({ message, onRetry }: { message: string; onRetry: () => void
       animate={{ opacity: 1 }}
       className="flex flex-col items-center justify-center gap-4 py-16"
     >
-      <p className="text-foreground/80">{message}</p>
+      <p className="text-foreground/70">{message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="px-4 py-2 border border-accent/60 text-accent uppercase tracking-[0.2em] text-xs hover:bg-accent/10"
+        className="btn-gradient px-6 py-3 text-xs uppercase"
       >
         Try again
       </button>

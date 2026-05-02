@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #f5f5f5;
-  --muted: #8a8580;
-  --accent: #d4af37;
-  --accent-soft: rgba(212, 175, 55, 0.15);
-  --panel: #131210;
-  --line: #1f1d1a;
+  --background: #fafafa;
+  --foreground: #18181b;
+  --muted: #71717a;
+  --muted-soft: #a1a1aa;
+  --line: #e7e7ea;
+  --panel: #ffffff;
+  --accent: #fd297b;
+  --accent-2: #ff5864;
+  --accent-3: #ff7854;
+  --accent-soft: rgba(253, 41, 123, 0.12);
+  --accent-glow: rgba(255, 88, 100, 0.35);
+  --shadow: 0 12px 40px -16px rgba(253, 41, 123, 0.25), 0 4px 16px -8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 24px 70px -20px rgba(253, 41, 123, 0.35), 0 8px 24px -8px rgba(0, 0, 0, 0.18);
 }
 
 @theme inline {
@@ -15,6 +21,8 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
   --color-panel: var(--panel);
   --color-line: var(--line);
   --font-sans: var(--font-inter);
@@ -29,70 +37,115 @@ html, body {
 
 body {
   font-family: var(--font-inter), system-ui, sans-serif;
-  background-image:
-    radial-gradient(1100px 600px at 80% -10%, rgba(212, 175, 55, 0.08), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(212, 175, 55, 0.05), transparent 65%);
+  background:
+    radial-gradient(900px 500px at 110% -20%, rgba(255, 120, 84, 0.18), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(253, 41, 123, 0.12), transparent 65%),
+    var(--background);
   background-attachment: fixed;
-  letter-spacing: 0.005em;
+  letter-spacing: -0.005em;
 }
 
 .serif { font-family: var(--font-playfair), Georgia, serif; }
 
-.portrait-vignette {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-3) 0%, var(--accent-2) 50%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-.portrait-vignette::after {
+
+.bg-gradient {
+  background: linear-gradient(135deg, var(--accent-3) 0%, var(--accent-2) 50%, var(--accent) 100%);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--accent-3) 0%, var(--accent-2) 50%, var(--accent) 100%);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px -8px var(--accent-glow);
+  transition: transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 200ms;
+}
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px -8px var(--accent-glow);
+}
+.btn-gradient:active { transform: translateY(0); }
+
+.card-bright {
+  background: var(--panel);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  transition: transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 280ms, border-color 200ms;
+  border: 1px solid var(--line);
+}
+.card-bright:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(253, 41, 123, 0.3);
+}
+.card-bright:focus-within {
+  border-color: var(--accent);
+}
+
+.portrait-bright {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  background: #f4f4f5;
+}
+.portrait-bright::after {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(120% 80% at 50% 30%, transparent 50%, rgba(0,0,0,0.55) 100%),
-    linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 35%);
+  background: linear-gradient(to top, rgba(0,0,0,0.0) 60%, transparent 100%);
   pointer-events: none;
-  z-index: 1;
 }
-.portrait-vignette img {
-  filter: saturate(0.78) contrast(1.05) brightness(0.92);
-  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 400ms;
+.portrait-bright img {
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.portrait-vignette:hover img,
-.portrait-vignette:focus-within img {
+.card-bright:hover .portrait-bright img,
+.card-bright:focus-within .portrait-bright img {
   transform: scale(1.04);
-  filter: saturate(0.95) contrast(1.08) brightness(1);
 }
-.portrait-vignette .portrait-glow {
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 300ms ease;
-  box-shadow:
-    0 0 0 1px rgba(212, 175, 55, 0.6),
-    0 0 60px 8px rgba(212, 175, 55, 0.35);
-  z-index: 2;
-}
-.portrait-vignette:hover .portrait-glow,
-.portrait-vignette:focus-within .portrait-glow {
-  opacity: 1;
+
+.wordmark {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: lowercase;
 }
 
 .divider-vs {
   font-family: var(--font-playfair), Georgia, serif;
   font-style: italic;
-  color: var(--accent);
-  letter-spacing: 0.2em;
+  background: linear-gradient(135deg, var(--accent-3), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.wordmark {
-  font-family: var(--font-playfair), Georgia, serif;
-  letter-spacing: 0.18em;
-  text-transform: lowercase;
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 ::selection {
   background: var(--accent-soft);
   color: var(--foreground);
+}
+
+@media (max-width: 640px) {
+  .card-bright { border-radius: 20px; }
+  .portrait-bright { border-radius: 16px 16px 0 0; }
 }

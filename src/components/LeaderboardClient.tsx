@@ -47,16 +47,16 @@ export function LeaderboardClient({ category = "historical" }: { category?: Cate
 
   return (
     <>
-      <div className="flex justify-center gap-1 mb-8 border-b border-line">
+      <div className="flex justify-center gap-2 mb-8">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => pickSort(t.id)}
-            className={`px-3 sm:px-4 py-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] transition-colors ${
+            className={`px-4 sm:px-5 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-[0.18em] font-semibold transition-all ${
               sort === t.id
-                ? "text-accent border-b border-accent -mb-px"
-                : "text-muted hover:text-foreground"
+                ? "bg-gradient text-white shadow-lg"
+                : "bg-panel border border-line text-muted hover:text-foreground hover:border-accent/40"
             }`}
           >
             {t.label}
@@ -69,7 +69,7 @@ export function LeaderboardClient({ category = "historical" }: { category?: Cate
       ) : status === "error" ? (
         <p className="text-foreground/70 text-center py-12">{error ?? "failed to load"}</p>
       ) : figures.length > 0 ? (
-        <ol className="space-y-1">
+        <ol>
           {figures.map((f, i) => (
             <Row key={f.id} figure={f} rank={i + 1} sort={sort} />
           ))}
@@ -87,14 +87,9 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
   const winRate = matches > 0 ? Math.round((wins / matches) * 100) : 0;
   const podium = rank <= 3;
 
-  const rankClass =
-    rank === 1
-      ? "text-accent"
-      : rank === 2
-        ? "text-[#c9c5b8]"
-        : rank === 3
-          ? "text-[#b08658]"
-          : "text-muted";
+  const rankClass = podium
+    ? "text-gradient font-bold"
+    : "text-muted font-semibold";
 
   return (
     <motion.li
@@ -104,17 +99,15 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
     >
       <Link
         href={`/figure/${encodeURIComponent(figure.wiki_slug)}`}
-        className="flex items-center gap-3 sm:gap-5 px-2 sm:px-4 py-3 border-b border-line hover:bg-panel/50 transition-colors group"
+        className="flex items-center gap-3 sm:gap-5 px-3 sm:px-5 py-3 sm:py-4 mb-2 rounded-2xl bg-panel border border-line hover:border-accent/40 hover:shadow-md transition-all group"
       >
         <div
-          className={`serif italic text-2xl sm:text-3xl tabular-nums w-10 sm:w-14 text-right ${rankClass} ${
-            podium ? "font-semibold" : ""
-          }`}
+          className={`text-2xl sm:text-3xl tabular-nums w-10 sm:w-14 text-right ${rankClass}`}
         >
           {rank}
         </div>
 
-        <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full overflow-hidden border border-line">
+        <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full overflow-hidden ring-2 ring-line group-hover:ring-accent/40 transition-all">
           {figure.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -129,10 +122,10 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="serif text-base sm:text-lg truncate group-hover:text-accent transition-colors">
+          <div className="text-base sm:text-lg font-semibold truncate group-hover:text-accent transition-colors">
             {figure.name}
           </div>
-          <div className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-muted truncate">
+          <div className="text-[10px] sm:text-xs uppercase tracking-[0.16em] text-muted truncate">
             {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
           </div>
         </div>
@@ -140,24 +133,24 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
         <div className="text-right shrink-0">
           {sort === "winrate" ? (
             <>
-              <div className="serif text-xl sm:text-2xl tabular-nums text-foreground">{winRate}%</div>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
+              <div className="text-xl sm:text-2xl font-bold tabular-nums text-foreground">{winRate}%</div>
+              <div className="text-[10px] uppercase tracking-[0.16em] text-muted">
                 {wins}/{matches}
               </div>
             </>
           ) : sort === "matches" ? (
             <>
-              <div className="serif text-xl sm:text-2xl tabular-nums text-foreground">{matches}</div>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
+              <div className="text-xl sm:text-2xl font-bold tabular-nums text-foreground">{matches}</div>
+              <div className="text-[10px] uppercase tracking-[0.16em] text-muted">
                 {Math.round(Number(figure.elo))} elo
               </div>
             </>
           ) : (
             <>
-              <div className="serif text-xl sm:text-2xl tabular-nums text-foreground">
+              <div className={`text-xl sm:text-2xl font-bold tabular-nums ${podium ? "text-gradient" : "text-foreground"}`}>
                 {Math.round(Number(figure.elo))}
               </div>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
+              <div className="text-[10px] uppercase tracking-[0.16em] text-muted">
                 {matches} match{matches === 1 ? "" : "es"}
               </div>
             </>
@@ -170,16 +163,16 @@ function Row({ figure, rank, sort }: { figure: Figure; rank: number; sort: Sort 
 
 function SkeletonRows() {
   return (
-    <ol className="space-y-1">
+    <ol>
       {Array.from({ length: 12 }).map((_, i) => (
         <li
           key={i}
-          className="flex items-center gap-4 px-2 py-3 border-b border-line animate-pulse"
+          className="flex items-center gap-4 px-3 sm:px-5 py-3 sm:py-4 mb-2 rounded-2xl bg-panel border border-line animate-pulse"
         >
-          <div className="w-10 h-6 bg-panel/60 rounded" />
-          <div className="h-12 w-12 rounded-full bg-panel/60" />
-          <div className="flex-1 h-5 bg-panel/60 rounded" />
-          <div className="w-12 h-6 bg-panel/60 rounded" />
+          <div className="w-10 sm:w-14 h-6 bg-line rounded" />
+          <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-line" />
+          <div className="flex-1 h-5 bg-line rounded" />
+          <div className="w-14 h-6 bg-line rounded" />
         </li>
       ))}
     </ol>

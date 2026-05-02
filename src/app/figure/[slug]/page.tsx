@@ -41,30 +41,29 @@ export default async function FigurePage({
   return (
     <div className="px-4 sm:px-8 pb-16 pt-2">
       <div className="max-w-4xl mx-auto">
-        <Link href={leaderboardHref} className="text-[10px] uppercase tracking-[0.25em] text-muted hover:text-accent">
+        <Link href={leaderboardHref} className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted hover:text-accent transition-colors">
           ← back to leaderboard
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 sm:gap-10 mt-6">
-          <div className="portrait-vignette aspect-[3/4] w-full md:w-[280px] border border-line">
+          <div className="portrait-bright aspect-[3/4] w-full md:w-[280px] rounded-3xl overflow-hidden shadow-[var(--shadow)]">
             {figure.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={figure.image_url} alt={figure.name} className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full bg-panel grid place-items-center text-muted text-xs uppercase tracking-widest">
+              <div className="h-full w-full bg-[#f4f4f5] grid place-items-center text-muted text-xs uppercase tracking-widest">
                 no portrait
               </div>
             )}
           </div>
 
           <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-muted flex items-center gap-3">
-              <span className="text-accent">{figure.category === "current" ? "Current" : "Historical"}</span>
-              <span className="text-muted/40">·</span>
-              <span>rank #{rank}</span>
+            <div className="flex items-center gap-3">
+              <span className="pill">{figure.category === "current" ? "Current" : "Historical"}</span>
+              <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted">rank #{rank}</span>
             </div>
-            <h1 className="serif text-4xl sm:text-5xl italic mt-1">{figure.name}</h1>
-            <div className="text-xs uppercase tracking-[0.2em] text-muted mt-2">
+            <h1 className="text-4xl sm:text-5xl mt-3 font-bold tracking-tight">{figure.name}</h1>
+            <div className="text-xs uppercase tracking-[0.18em] font-semibold text-muted mt-2">
               {formatYears(figure.birth_year, figure.death_year) ?? "dates unknown"}
             </div>
             {figure.short_blurb && (
@@ -83,7 +82,7 @@ export default async function FigurePage({
         </div>
 
         <section className="mt-10 sm:mt-14">
-          <h2 className="text-[10px] uppercase tracking-[0.3em] text-muted mb-4">Recent matchups</h2>
+          <h2 className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted mb-4">Recent matchups</h2>
           {recent.length === 0 ? (
             <p className="text-foreground/60 text-sm">No matches yet.</p>
           ) : (
@@ -92,25 +91,25 @@ export default async function FigurePage({
                 <li key={m.id}>
                   <Link
                     href={m.opponent.wiki_slug ? `/figure/${encodeURIComponent(m.opponent.wiki_slug)}` : "#"}
-                    className="flex items-center gap-3 sm:gap-4 px-3 py-3 border border-line bg-panel/30 hover:border-accent/40 transition-colors"
+                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 rounded-2xl bg-panel border border-line hover:border-accent/40 hover:shadow-md transition-all"
                   >
                     <span
-                      className={`text-[10px] uppercase tracking-[0.2em] w-12 ${
-                        m.outcome === "win" ? "text-accent" : "text-muted"
+                      className={`text-[10px] uppercase tracking-[0.18em] font-bold w-14 ${
+                        m.outcome === "win" ? "text-gradient" : "text-muted"
                       }`}
                     >
                       {m.outcome === "win" ? "Beat" : "Lost to"}
                     </span>
-                    <div className="h-10 w-10 rounded-full overflow-hidden border border-line shrink-0">
+                    <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-line shrink-0">
                       {m.opponent.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={m.opponent.image_url} alt={m.opponent.name} className="h-full w-full object-cover" />
                       ) : (
-                        <div className="h-full w-full bg-panel" />
+                        <div className="h-full w-full bg-line" />
                       )}
                     </div>
-                    <span className="serif flex-1 truncate">{m.opponent.name}</span>
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted/70">
+                    <span className="font-semibold flex-1 truncate">{m.opponent.name}</span>
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-muted">
                       {new Date(m.created_at).toLocaleDateString()}
                     </span>
                   </Link>
@@ -123,7 +122,7 @@ export default async function FigurePage({
         <div className="mt-12 text-center">
           <Link
             href={matchupHref}
-            className="inline-block px-6 py-3 border border-accent/60 text-accent uppercase tracking-[0.25em] text-xs hover:bg-accent/10 transition-colors"
+            className="btn-gradient inline-block px-7 py-3 text-xs uppercase"
           >
             Vote in a new matchup
           </Link>
@@ -135,9 +134,9 @@ export default async function FigurePage({
 
 function Stat({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="border border-line bg-panel/30 px-3 py-3 text-center">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-muted">{label}</div>
-      <div className={`serif text-2xl sm:text-3xl tabular-nums mt-1 ${accent ? "text-accent" : ""}`}>
+    <div className="rounded-2xl border border-line bg-panel px-3 py-4 text-center shadow-sm">
+      <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted">{label}</div>
+      <div className={`text-2xl sm:text-3xl font-bold tabular-nums mt-1 ${accent ? "text-gradient" : ""}`}>
         {value}
       </div>
     </div>

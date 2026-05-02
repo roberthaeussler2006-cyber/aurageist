@@ -3,6 +3,8 @@ Jesus,Jesus,historical
 Muhammad,Muhammad,historical
 Gautama Buddha,Gautama_Buddha,historical
 Moses,Moses,historical
+Mother Teresa,Mother_Teresa,historical
+Pope John Paul II,Pope_John_Paul_II,historical
 Alexander the Great,Alexander_the_Great,historical
 Julius Caesar,Julius_Caesar,historical
 Cleopatra,Cleopatra,historical
@@ -58,10 +60,14 @@ Che Guevara,Che_Guevara,historical
 Saddam Hussein,Saddam_Hussein,historical
 Osama bin Laden,Osama_bin_Laden,historical
 Pablo Picasso,Pablo_Picasso,historical
+Walt Disney,Walt_Disney,historical
 Charlie Chaplin,Charlie_Chaplin,historical
+Marilyn Monroe,Marilyn_Monroe,historical
 Elvis Presley,Elvis_Presley,historical
 John Lennon,John_Lennon,historical
 Bob Marley,Bob_Marley,historical
+Michael Jackson,Michael_Jackson,historical
+Princess Diana,"Diana,_Princess_of_Wales",historical
 Bruce Lee,Bruce_Lee,historical
 Muhammad Ali,Muhammad_Ali,historical
 Pelé,Pelé,historical
@@ -79,6 +85,15 @@ Bernie Sanders,Bernie_Sanders,current
 Alexandria Ocasio-Cortez,Alexandria_Ocasio-Cortez,current
 Ron DeSantis,Ron_DeSantis,current
 Marjorie Taylor Greene,Marjorie_Taylor_Greene,current
+Mike Pence,Mike_Pence,current
+Sarah Palin,Sarah_Palin,current
+Elizabeth Warren,Elizabeth_Warren,current
+Pete Buttigieg,Pete_Buttigieg,current
+Hunter Biden,Hunter_Biden,current
+Donald Trump Jr.,Donald_Trump_Jr.,current
+Ivanka Trump,Ivanka_Trump,current
+Andrew Cuomo,Andrew_Cuomo,current
+Rudy Giuliani,Rudy_Giuliani,current
 Charlie Kirk,Charlie_Kirk,current
 Tucker Carlson,Tucker_Carlson,current
 Ben Shapiro,Ben_Shapiro,current
@@ -88,6 +103,8 @@ Jordan Peterson,Jordan_Peterson,current
 Robert F. Kennedy Jr.,Robert_F._Kennedy_Jr.,current
 Alex Jones,Alex_Jones,current
 Steve Bannon,Steve_Bannon,current
+Anthony Fauci,Anthony_Fauci,current
+George Soros,George_Soros,current
 Kamala Harris,Kamala_Harris,current
 Nancy Pelosi,Nancy_Pelosi,current
 Mitch McConnell,Mitch_McConnell,current
@@ -108,8 +125,13 @@ Marine Le Pen,Marine_Le_Pen,current
 Nigel Farage,Nigel_Farage,current
 Mohammed bin Salman,Mohammed_bin_Salman,current
 Bashar al-Assad,Bashar_al-Assad,current
-Mahmoud Abbas,Mahmoud_Abbas,current
 Pope Francis,Pope_Francis,current
+Meghan Markle,Meghan_Markle,current
+Prince Harry,"Prince_Harry,_Duke_of_Sussex",current
+King Charles III,Charles_III,current
+Prince William,"William,_Prince_of_Wales",current
+Catherine Princess of Wales,"Catherine,_Princess_of_Wales",current
+Prince Andrew,"Prince_Andrew,_Duke_of_York",current
 Elon Musk,Elon_Musk,current
 Mark Zuckerberg,Mark_Zuckerberg,current
 Jeff Bezos,Jeff_Bezos,current
@@ -117,14 +139,8 @@ Bill Gates,Bill_Gates,current
 Sam Altman,Sam_Altman,current
 Peter Thiel,Peter_Thiel,current
 Tim Cook,Tim_Cook,current
-Sundar Pichai,Sundar_Pichai,current
-Satya Nadella,Satya_Nadella,current
-Larry Page,Larry_Page,current
-Sergey Brin,Sergey_Brin,current
 Jack Dorsey,Jack_Dorsey,current
-Vitalik Buterin,Vitalik_Buterin,current
-Marc Andreessen,Marc_Andreessen,current
-Sheryl Sandberg,Sheryl_Sandberg,current
+Sam Bankman-Fried,Sam_Bankman-Fried,current
 LeBron James,LeBron_James,current
 Cristiano Ronaldo,Cristiano_Ronaldo,current
 Lionel Messi,Lionel_Messi,current
@@ -135,28 +151,41 @@ Tiger Woods,Tiger_Woods,current
 Serena Williams,Serena_Williams,current
 Stephen Curry,Stephen_Curry,current
 Kevin Durant,Kevin_Durant,current
-Aaron Rodgers,Aaron_Rodgers,current
 Mike Tyson,Mike_Tyson,current
 Lance Armstrong,Lance_Armstrong,current
-Khabib Nurmagomedov,Khabib_Nurmagomedov,current
-Naomi Osaka,Naomi_Osaka,current
 Kanye West,Kanye_West,current
 Taylor Swift,Taylor_Swift,current
 Beyoncé,Beyoncé,current
 Jay-Z,Jay-Z,current
 Drake,Drake_(musician),current
+Madonna,Madonna,current
+Oprah Winfrey,Oprah_Winfrey,current
+Ellen DeGeneres,Ellen_DeGeneres,current
+Tom Cruise,Tom_Cruise,current
+Leonardo DiCaprio,Leonardo_DiCaprio,current
+Brad Pitt,Brad_Pitt,current
+Angelina Jolie,Angelina_Jolie,current
+Tom Hanks,Tom_Hanks,current
+Will Smith,Will_Smith,current
+Dave Chappelle,Dave_Chappelle,current
+Chris Rock,Chris_Rock,current
+J.K. Rowling,J._K._Rowling,current
+Roman Polanski,Roman_Polanski,current
+Woody Allen,Woody_Allen,current
+Russell Brand,Russell_Brand,current
 Kim Kardashian,Kim_Kardashian,current
 Kylie Jenner,Kylie_Jenner,current
+Caitlyn Jenner,Caitlyn_Jenner,current
 Justin Bieber,Justin_Bieber,current
 Rihanna,Rihanna,current
 Ariana Grande,Ariana_Grande,current
 Eminem,Eminem,current
+Travis Scott,Travis_Scott,current
 Chris Brown,Chris_Brown,current
 Cardi B,Cardi_B,current
 Nicki Minaj,Nicki_Minaj,current
 Logan Paul,Logan_Paul,current
 Jake Paul,Jake_Paul,current
-MrBeast,MrBeast,current
 PewDiePie,PewDiePie,current
 Sean Combs,Sean_Combs,current
 R. Kelly,R._Kelly,current
@@ -164,6 +193,7 @@ Bill Cosby,Bill_Cosby,current
 Harvey Weinstein,Harvey_Weinstein,current
 Jeffrey Epstein,Jeffrey_Epstein,current
 Ghislaine Maxwell,Ghislaine_Maxwell,current
+Larry Nassar,Larry_Nassar,current
 O. J. Simpson,O._J._Simpson,current
 Greta Thunberg,Greta_Thunberg,current
 Malala Yousafzai,Malala_Yousafzai,current
