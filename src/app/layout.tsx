@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { AuthProvider } from "@/components/AuthProvider";
 import { BrainrotPanel } from "@/components/BrainrotPanel";
 import { SlotMachine } from "@/components/SlotMachine";
+import { KirkClicker } from "@/components/KirkClicker";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </footer>
           <BrainrotPanel />
           <SlotMachine />
+          <KirkClicker />
         </AuthProvider>
       </body>
     </html>
