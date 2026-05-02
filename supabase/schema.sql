@@ -81,6 +81,7 @@ create table if not exists comments (
   id uuid primary key default gen_random_uuid(),
   figure_id uuid not null references figures(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
+  parent_id uuid references comments(id) on delete cascade,
   author_name text not null check (length(author_name) between 1 and 40),
   body text not null check (length(body) between 1 and 1000),
   created_at timestamptz not null default now()
@@ -89,6 +90,11 @@ create table if not exists comments (
 -- Open up to anonymous posters: drop the old NOT NULL constraint on user_id
 -- on installs that ran the earlier version of this schema.
 alter table comments alter column user_id drop not null;
+alter table comments add column if not exists parent_id uuid references comments(id) on delete cascade;
+create index if not exists comments_parent_idx on comments (parent_id);
+create index if not exists comments_figure_root_created_idx
+  on comments (figure_id, created_at desc)
+  where parent_id is null;
 
 create index if not exists comments_figure_created_idx on comments (figure_id, created_at desc);
 
